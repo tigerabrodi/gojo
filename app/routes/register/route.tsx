@@ -109,17 +109,16 @@ export default function Register() {
   );
 }
 
-const schema = z
-  .object({
-    name: z.string(),
-    email: z.string().email(),
-    password: z.string().min(6),
-    confirmPassword: z.string().min(6),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
-    path: ["confirmPassword"],
-  });
+const schema = z.object({
+  name: z.string(),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
+});
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -129,7 +128,15 @@ export async function action({ request }: ActionFunctionArgs) {
     return submission.reply();
   }
 
-  const { email, password } = submission.value;
+  const { email, password, confirmPassword } = submission.value;
+
+  if (password !== confirmPassword) {
+    return submission.reply({
+      fieldErrors: {
+        confirmPassword: ["Passwords do not match."],
+      },
+    });
+  }
 
   const userExists = await checkUserExists(email);
 
