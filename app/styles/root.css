@@ -1,0 +1,112 @@
+:root {
+  --colors-primary-700: hsl(220, 43%, 15%);
+  --colors-primary-400: hsl(210, 3%, 53%);
+  --colors-primary-200: hsl(210, 8%, 87%);
+  --colors-beige: hsl(52, 89%, 61%);
+  --colors-danger: hsl(0, 100%, 47%);
+  --colors-white: hsl(0, 0%, 100%);
+}
+
+/* Global Styles */
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  font-family: "Overpass", sans-serif;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--colors-white);
+}
+
+/* Custom Resets */
+button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+a {
+  text-decoration: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 0.7;
+  color: inherit;
+}
+
+input,
+textarea {
+  border: none;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+input:disabled,
+button:disabled {
+  opacity: 0.5;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px black !important;
+}
+
+/* screen reader only styles */
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  top: auto;
+  overflow: hidden;
+}
+
+img {
+  object-fit: cover;
+  object-position: center;
+}
+
+@keyframes spinning {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spinning 0.3s linear infinite;
+  width: 40px;
+  height: 40px;
+}
+
+.spinner svg {
+  width: 100%;
+  height: 100%;
+}
+
+.spinner svg path {
+  fill: var(--colors-primary-700);
+}
