@@ -9,6 +9,7 @@ import {
 } from "@remix-run/react";
 import { Analytics } from "@vercel/analytics/react";
 import rootStyles from "./styles/root.css";
+import overpassFont from "@fontsource-variable/overpass/index.css";
 import {
   redirect,
   type LinksFunction,
@@ -16,10 +17,13 @@ import {
   type MetaFunction,
 } from "@vercel/remix";
 import { getAuthFromRequest } from "./auth/auth";
+import { Navigation, navigationLinks } from "./components";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   { rel: "stylesheet", href: rootStyles },
+  ...navigationLinks(),
+  { rel: "stylesheet", href: overpassFont },
 ];
 
 export const meta: MetaFunction = () => {
@@ -51,6 +55,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Navigation />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

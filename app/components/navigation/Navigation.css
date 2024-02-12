@@ -1,0 +1,44 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 60px;
+  background-color: var(--colors-white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  position: sticky;
+  top: 0;
+  left: 0;
+
+  .logo {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+
+    .svg {
+      width: 42px;
+    }
+
+    span {
+      font-size: calc(1rem * 28 / 16);
+      color: var(--colors-primary-700);
+      font-weight: bold;
+    }
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    column-gap: 60px;
+
+    a {
+      font-weight: 500;
+      font-size: calc(1rem * 20 / 16);
+      color: var(--colors-primary-700);
+    }
+  }
+
+  .active {
+    text-decoration: underline;
+  }
+}
