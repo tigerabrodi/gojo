@@ -1,3 +1,7 @@
+import { redirectIfLoggedInLoader } from "~/auth";
+
+export const loader = redirectIfLoggedInLoader;
+
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
