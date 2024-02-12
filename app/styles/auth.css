@@ -1,0 +1,114 @@
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 30px;
+  padding-bottom: 50px;
+  row-gap: 36px;
+
+  .heading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 8px;
+
+    h1 {
+      font-weight: 700;
+      font-size: calc(1rem * 48 / 16);
+      color: var(--colors-primary-700);
+    }
+
+    p {
+      font-weight: 500;
+      font-size: calc(1rem * 24 / 16);
+      color: var(--colors-primary-700);
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 20px;
+    padding: 40px 80px;
+    width: 700px;
+    height: 100%;
+    border: 1px solid var(--colors-primary-400);
+    border-radius: 2px;
+
+    h2 {
+      font-weight: 500;
+      font-size: calc(1rem * 32 / 16);
+      color: var(--colors-primary-700);
+    }
+
+    .groups {
+      display: flex;
+      flex-direction: column;
+      row-gap: 40px;
+      width: 100%;
+
+      .group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        row-gap: 12px;
+
+        label {
+          font-size: calc(1rem * 18 / 16);
+          font-weight: 500;
+          color: var(--colors-primary-700);
+        }
+
+        input {
+          font-weight: 500;
+          font-size: calc(1rem * 16 / 16);
+          color: var(--colors-primary-700);
+          border: 1px solid var(--colors-primary-400);
+          border-radius: 2px;
+          padding: 10px;
+          &:focus {
+            box-shadow: 0px 0px 2px var(--colors-primary-400);
+            border: 1px solid var(--colors-primary-700);
+          }
+        }
+
+        .label-group {
+          display: flex;
+          flex-direction: column;
+          row-gap: 4px;
+
+          span {
+            font-weight: 400;
+            font-size: calc(1rem * 14 / 16);
+            color: var(--colors-primary-400);
+          }
+        }
+
+        .error {
+          font-weight: 500;
+          font-size: calc(1rem * 14 / 16);
+          color: var(--colors-danger);
+        }
+      }
+    }
+
+    button {
+      background-color: var(--colors-primary-200);
+      color: var(--colors-primary-700);
+      border: 1px solid var(--colors-primary-700);
+      border-radius: 2px;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+      margin-top: auto;
+      padding: 10px;
+      font-size: calc(1rem * 16 / 16);
+      font-weight: 700;
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
