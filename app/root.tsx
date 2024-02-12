@@ -6,15 +6,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { Analytics } from "@vercel/analytics/react";
 import rootStyles from "./styles/root.css";
 import overpassFont from "@fontsource-variable/overpass/index.css";
 import {
-  redirect,
   type LinksFunction,
   type LoaderFunctionArgs,
   type MetaFunction,
+  json,
 } from "@vercel/remix";
 import { getAuthFromRequest } from "./auth/auth";
 import { Navigation, navigationLinks } from "./components";
@@ -38,14 +39,16 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  let userId = await getAuthFromRequest(request);
-  if (userId && new URL(request.url).pathname === "/") {
-    throw redirect("/login");
-  }
-  return userId;
+  const userId = await getAuthFromRequest(request);
+
+  return json({
+    isAuthenticated: Boolean(userId),
+  });
 }
 
 export default function App() {
+  const { isAuthenticated } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -55,7 +58,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Navigation />
+        <Navigation isAuthenticated={isAuthenticated} />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

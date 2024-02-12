@@ -7,7 +7,7 @@ export const navigationLinks: LinksFunction = () => [
   { rel: "stylesheet", href: navigationStyles },
 ];
 
-export function Navigation() {
+export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
   const location = useLocation();
 
   return (
@@ -19,20 +19,26 @@ export function Navigation() {
         <span>Gojo</span>
       </div>
 
-      <div className="links">
-        <Link
-          to="/login"
-          className={location.pathname === "/login" ? "active" : ""}
-        >
-          Login
-        </Link>
-        <Link
-          to="/register"
-          className={location.pathname === "/register" ? "active" : ""}
-        >
-          Register
-        </Link>
-      </div>
+      {isAuthenticated ? (
+        <form method="post" action="/logout">
+          <button>Logout</button>
+        </form>
+      ) : (
+        <div className="links">
+          <Link
+            to="/login"
+            className={location.pathname === "/login" ? "active" : ""}
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className={location.pathname === "/register" ? "active" : ""}
+          >
+            Register
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }

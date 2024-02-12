@@ -41,4 +41,12 @@ nav {
   .active {
     text-decoration: underline;
   }
+
+  form {
+    button {
+      font-weight: 500;
+      font-size: calc(1rem * 20 / 16);
+      color: var(--colors-primary-700);
+    }
+  }
 }
