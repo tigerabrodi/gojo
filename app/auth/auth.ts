@@ -67,5 +67,16 @@ export async function redirectIfLoggedInLoader({
   if (userId) {
     throw redirect("/boards");
   }
+
   return null;
+}
+
+export async function redirectFromRoot({ request }: LoaderFunctionArgs) {
+  let userId = await getAuthFromRequest(request);
+
+  if (userId) {
+    throw redirect("/boards");
+  } else {
+    throw redirect("/login");
+  }
 }
