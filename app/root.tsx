@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useMatches,
 } from "@remix-run/react";
 import { Analytics } from "@vercel/analytics/react";
 import rootStyles from "./styles/root.css";
@@ -19,6 +20,7 @@ import {
 } from "@vercel/remix";
 import { getAuthFromRequest } from "./auth/auth";
 import { Navigation, navigationLinks } from "./components";
+import type { MatchHandle } from "./helpers";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -48,6 +50,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function App() {
   const { isAuthenticated } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+
+  const shouldHideRootNavigation =
+    matches.filter(
+      (match) => (match.handle as MatchHandle)?.shouldHideRootNavigation
+    ).length > 0;
 
   return (
     <html lang="en">
@@ -58,7 +66,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Navigation isAuthenticated={isAuthenticated} />
+        {!shouldHideRootNavigation && (
+          <Navigation isAuthenticated={isAuthenticated} />
+        )}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
