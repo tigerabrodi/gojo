@@ -149,5 +149,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   let user = await createUser(email, password);
+  // TODO: Toast message
   return setAuthOnResponse(redirect("/boards"), user.id);
 }

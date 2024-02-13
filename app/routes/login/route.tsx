@@ -111,5 +111,6 @@ export async function action({ request }: { request: Request }) {
   }
 
   let response = redirect("/boards");
+  // TODO: Toast message
   return setAuthOnResponse(response, userId);
 }
