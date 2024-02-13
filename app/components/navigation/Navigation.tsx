@@ -13,10 +13,10 @@ export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <nav>
       <div className="logo">
-        <Link to="/" aria-label="home">
+        <Link to="/" aria-label="home" className="logo">
           <Kakashi />
+          <span>Gojo</span>
         </Link>
-        <span>Gojo</span>
       </div>
 
       {isAuthenticated ? (
