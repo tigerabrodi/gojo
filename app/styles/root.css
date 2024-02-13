@@ -85,28 +85,3 @@ img {
   object-fit: cover;
   object-position: center;
 }
-
-@keyframes spinning {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.spinner {
-  animation: spinning 0.3s linear infinite;
-  width: 40px;
-  height: 40px;
-}
-
-.spinner svg {
-  width: 100%;
-  height: 100%;
-}
-
-.spinner svg path {
-  fill: var(--colors-primary-700);
-}
