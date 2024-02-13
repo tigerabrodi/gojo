@@ -16,8 +16,9 @@ nav {
     align-items: center;
     column-gap: 8px;
 
-    .svg {
+    svg {
       width: 42px;
+      height: 48px;
     }
 
     span {
