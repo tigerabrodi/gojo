@@ -22,3 +22,19 @@ export async function createBoard(
     return board;
   });
 }
+
+export async function getBoardsForUser(userId: string) {
+  const result = await prisma.boardRole.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      board: true,
+    },
+  });
+
+  return result.map(({ board }) => ({
+    ...board,
+    lastOpenedAt: board.lastOpenedAt?.toLocaleDateString() ?? null,
+  }));
+}
