@@ -17,6 +17,7 @@ export type Storage = {
       id: string;
     }>
   >;
+  boardName: string;
 };
 
 type UserMeta = {

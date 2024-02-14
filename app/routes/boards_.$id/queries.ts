@@ -10,3 +10,20 @@ export async function updateBoardLastOpenedAt(boardId: string) {
     },
   });
 }
+
+export async function updateBoardName({
+  boardId,
+  newBoardName,
+}: {
+  boardId: string;
+  newBoardName: string;
+}) {
+  await prisma.board.update({
+    where: {
+      id: boardId,
+    },
+    data: {
+      name: newBoardName,
+    },
+  });
+}

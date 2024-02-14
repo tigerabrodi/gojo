@@ -3,6 +3,7 @@ export const FORM_INTENTS = {
   login: "login",
   createBoard: "createBoard",
   addPerson: "addPerson",
+  updateBoardName: "updateBoardName",
 } as const;
 
 export const INTENT = "intent";
