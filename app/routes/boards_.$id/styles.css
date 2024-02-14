@@ -14,9 +14,10 @@ main {
   height: 100%;
   width: 100%;
   position: relative;
+  background-color: var(--colors-primary-200);
 
   .suspense-fallback-loader {
-    animation: pulse 0.2s infinite ease-in;
+    animation: pulse 0.4s infinite ease-in;
     position: absolute;
     top: 40%;
     left: 50%;

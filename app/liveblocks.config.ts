@@ -1,6 +1,7 @@
 import type { LiveList, LiveObject } from "@liveblocks/client";
 import { createClient } from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
+import type { Card } from "./helpers";
 
 const client = createClient({
   authEndpoint: "/api/liveblocks-auth",
@@ -11,12 +12,7 @@ type Presence = {
 };
 
 export type Storage = {
-  cards: LiveList<
-    LiveObject<{
-      text: string;
-      id: string;
-    }>
-  >;
+  cards: LiveList<LiveObject<Card>>;
   boardName: string;
 };
 
