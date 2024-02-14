@@ -3,6 +3,8 @@ import navigationStyles from "./Navigation.css";
 import { Kakashi } from "~/icons";
 import { Link, useLocation } from "@remix-run/react";
 
+export const NAVIGATION_PORTAL_ID = "navigation-portal";
+
 export const navigationLinks: LinksFunction = () => [
   { rel: "stylesheet", href: navigationStyles },
 ];
@@ -19,6 +21,8 @@ export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
         </Link>
       </div>
 
+      <div id={NAVIGATION_PORTAL_ID} />
+
       {isAuthenticated ? (
         <form method="post" action="/logout">
           <button>Logout</button>
@@ -27,12 +31,14 @@ export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
         <div className="links">
           <Link
             to="/login"
+            prefetch="render"
             className={location.pathname === "/login" ? "active" : ""}
           >
             Login
           </Link>
           <Link
             to="/register"
+            prefetch="render"
             className={location.pathname === "/register" ? "active" : ""}
           >
             Register
