@@ -12,7 +12,12 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 import { ClientSideSuspense } from "@liveblocks/react";
 import styles from "./styles.css";
 import { Kakashi } from "~/icons";
-import { Card, NAVIGATION_PORTAL_ID, cardLinks } from "~/components";
+import {
+  CARD_DIMENSIONS,
+  Card,
+  NAVIGATION_PORTAL_ID,
+  cardLinks,
+} from "~/components";
 import { createPortal } from "react-dom";
 import { updateBoardLastOpenedAt, updateBoardName } from "./queries";
 import { useDebounceFetcher } from "remix-utils/use-debounce-fetcher";
@@ -97,8 +102,11 @@ function Board() {
     ({ storage }, event: MouseEvent<HTMLElement>) => {
       const newId = v1();
 
-      const positionX = event.clientX;
-      const positionY = event.clientY;
+      console.log("event.clientX", event.clientX);
+      console.log("event.clientY", event.clientY);
+
+      const positionX = event.clientX - CARD_DIMENSIONS.width / 2;
+      const positionY = event.clientY - CARD_DIMENSIONS.height;
 
       const newCard: CardType = {
         id: newId,
@@ -134,7 +142,7 @@ function Board() {
           />
           <Link
             to={`/boards/${boardId}/share`}
-            prefetch="render"
+            // prefetch="render"
             className="portal-board-share-link"
           >
             Share
