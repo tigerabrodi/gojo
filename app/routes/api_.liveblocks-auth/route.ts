@@ -20,11 +20,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     },
   });
 
-  const { room: roomId } = await request.json();
+  const { room } = await request.json();
 
-  invariant(typeof roomId === "string", "Invalid room");
+  invariant(typeof room === "string", "Invalid room");
 
-  const role = await getUserRole(user.id, roomId);
+  const role = await getUserRole(user.id, room);
 
   if (!role) {
     // TODO: Toast message
@@ -32,7 +32,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // currently only support editor role so give full access
-  session.allow(roomId, session.FULL_ACCESS);
+  session.allow(room, session.FULL_ACCESS);
 
   // Authorize the user and return the result
   const result = await session.authorize();
