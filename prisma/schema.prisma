@@ -28,19 +28,12 @@ model Password {
 model Board {
   id       String      @id @default(uuid())
   name     String
-  cards    Card[]
   roles    BoardRole[] // Relation to track user roles on this board
   lastOpenedAt DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
 
-model Card {
-  id      String @id @default(uuid())
-  text    String
-  board   Board  @relation(fields: [boardId], references: [id])
-  boardId String
-}
 
 model BoardRole {
   id       String   @id @default(uuid())
