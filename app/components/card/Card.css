@@ -2,4 +2,47 @@
   position: absolute;
   background-color: var(--colors-beige);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+
+  &:focus {
+    outline: 2px solid var(--colors-primary-700);
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--colors-primary-700);
+    .toolbar {
+      display: flex;
+    }
+  }
+
+  span {
+    font-weight: 500;
+    font-size: calc(1rem * 16 / 16);
+    color: var(--colors-primary-700);
+    max-height: 100%;
+    overflow: auto;
+    outline: none;
+  }
+
+  .toolbar {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--colors-white);
+    border-radius: 2px;
+    padding: 8px 40px;
+    align-items: center;
+    justify-content: center;
+    column-gap: 20px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    display: none;
+
+    button {
+      svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+  }
 }
