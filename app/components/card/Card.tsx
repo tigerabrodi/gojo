@@ -87,9 +87,6 @@ export function Card({ card }: { card: CardType }) {
       moveCursorToEnd(cardContentRef.current);
 
       setIsCardContentFocused(true);
-
-      // Scroll to the bottom of the contentEditable span
-      cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
     }
 
     // Needed to prevent card from being created when double clicking
@@ -122,6 +119,13 @@ export function Card({ card }: { card: CardType }) {
     }
   }
 
+  function scrollToTheBottomOfCardContent() {
+    if (cardContentRef.current) {
+      // Scroll to the bottom of the contentEditable span
+      cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
+    }
+  }
+
   return (
     <div
       role="button"
@@ -146,6 +150,9 @@ export function Card({ card }: { card: CardType }) {
         suppressContentEditableWarning
         ref={cardContentRef}
         onInput={handleInput}
+        onFocus={() => {
+          scrollToTheBottomOfCardContent();
+        }}
         style={{
           cursor: isCardContentFocused ? "text" : "default",
         }}
