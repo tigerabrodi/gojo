@@ -26,12 +26,12 @@
 
   .toolbar {
     position: absolute;
-    top: -60px;
+    top: -55px;
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--colors-white);
     border-radius: 2px;
-    padding: 8px 40px;
+    padding: 0px 40px;
     align-items: center;
     justify-content: center;
     column-gap: 20px;
@@ -39,9 +39,16 @@
     display: none;
 
     button {
+      padding: 8px;
+      transition: 0.1s;
+
+      &:hover {
+        background-color: var(--colors-primary-200);
+      }
+
       svg {
-        width: 26px;
-        height: 26px;
+        width: 22px;
+        height: 22px;
       }
     }
   }

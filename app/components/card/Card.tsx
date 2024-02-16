@@ -31,6 +31,14 @@ export function Card({ card }: { card: CardType }) {
     }
   }, []);
 
+  const onDelete = useMutation(({ storage }, id: string) => {
+    const cards = storage.get("cards");
+    const index = cards.findIndex((card) => card.get("id") === id);
+    if (index !== -1) {
+      cards.delete(index);
+    }
+  }, []);
+
   function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
     setIsDragging(true);
     setStartPosition({
@@ -79,10 +87,6 @@ export function Card({ card }: { card: CardType }) {
     cardContentRef.current?.blur();
   }
 
-  function onDelete() {
-    console.log("delete");
-  }
-
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
@@ -118,7 +122,10 @@ export function Card({ card }: { card: CardType }) {
       </span>
 
       <Toolbar.Root className="toolbar">
-        <Toolbar.Button aria-label="Delete" onClick={onDelete}>
+        <Toolbar.Button
+          aria-label="Delete"
+          onClick={(event) => onDelete(card.id)}
+        >
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
