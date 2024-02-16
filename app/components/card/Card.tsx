@@ -110,15 +110,17 @@ export function Card({ card }: { card: CardType }) {
   }
 
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape" && cardContentRef.current) {
+    if (event.key === "Enter") {
+      // TODO: Deal with implementation of breaklines
+      // This is a temporary thing to prevent users from creating breaklines
+      // Currently we can't properly update the card content because it isn't included in `event.currentTarget.textContent`
+      // We can get it via `innerHTML`, but it's a dangerous due to XSS attacks
+      // We need more research on how to properly handle this
+      event.preventDefault();
+    } else if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
     }
   }
-
-  console.log(
-    "is card content focused",
-    document.activeElement === cardContentRef.current
-  );
 
   return (
     <div
