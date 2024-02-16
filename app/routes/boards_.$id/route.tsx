@@ -27,6 +27,7 @@ import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
 import type { MouseEvent } from "react";
 import { v1 } from "uuid";
+import { checkUserAllowedToEditBoard } from "./validate";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -156,10 +157,11 @@ function Board() {
 
 const schema = z.object({
   boardName: z.string(),
-  intent: z.literal(FORM_INTENTS.updateBoardName),
 });
 
 export async function action({ request, params }: ActionFunctionArgs) {
+  const userId = await requireAuthCookie(request);
+
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema });
 
@@ -171,14 +173,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   invariant(boardId, "No board ID provided");
 
-  const { intent, boardName } = submission.value;
+  const { boardName } = submission.value;
 
-  if (intent === FORM_INTENTS.updateBoardName) {
-    await updateBoardName({
-      newBoardName: boardName,
-      boardId,
-    });
+  const isUserAllowedToEditBoard = await checkUserAllowedToEditBoard({
+    userId,
+    boardId,
+  });
+
+  // If this ever happens, likely API request
+  // Simply throw 403 authorization error
+  if (!isUserAllowedToEditBoard) {
+    return json(
+      { message: "You are not allowed to edit this board" },
+      { status: 403 }
+    );
   }
+
+  await updateBoardName({
+    newBoardName: boardName,
+    boardId,
+  });
 
   return submission.reply();
 }
