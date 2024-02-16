@@ -82,9 +82,17 @@ export function Card({ card }: { card: CardType }) {
   function onDoubleClick(event: MouseEvent<HTMLDivElement>) {
     if (cardContentRef.current) {
       cardContentRef.current.focus();
+
+      // Needed because we're working with `contentEditable` element
       moveCursorToEnd(cardContentRef.current);
+
       setIsCardContentFocused(true);
+
+      // Scroll to the bottom of the contentEditable span
+      cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
     }
+
+    // Needed to prevent card from being created when double clicking
     event.stopPropagation();
   }
 
@@ -144,10 +152,7 @@ export function Card({ card }: { card: CardType }) {
       </span>
 
       <Toolbar.Root className="toolbar">
-        <Toolbar.Button
-          aria-label="Delete"
-          onClick={(event) => onDelete(card.id)}
-        >
+        <Toolbar.Button aria-label="Delete" onClick={() => onDelete(card.id)}>
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
