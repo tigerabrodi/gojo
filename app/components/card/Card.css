@@ -59,7 +59,6 @@
 
     button {
       padding: 8px;
-      transition: 0.1s;
 
       &:hover {
         background-color: var(--colors-primary-200);
