@@ -9,8 +9,8 @@ import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
 
 export const CARD_DIMENSIONS = {
-  width: 150,
-  height: 150,
+  width: 200,
+  height: 200,
 } as const;
 
 export const cardLinks: LinksFunction = () => [
@@ -20,6 +20,10 @@ export const cardLinks: LinksFunction = () => [
 export function Card({ card }: { card: CardType }) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+
+  // Needed to change the cursor to text when the card content is focused
+  // To properly re-render
+  const [isCardContentFocused, setIsCardContentFocused] = useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
@@ -40,12 +44,20 @@ export function Card({ card }: { card: CardType }) {
   }, []);
 
   function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
+    // If the card content is focused, we don't want to start dragging the card
+    // User is editing the text
+    const isCardContentCurrentlyFocused =
+      document.activeElement === cardContentRef.current;
+    if (isCardContentCurrentlyFocused) {
+      return;
+    }
+
     setIsDragging(true);
     setStartPosition({
       x: event.clientX - card.positionX,
       y: event.clientY - card.positionY,
     });
-    event.preventDefault(); // Prevent text selection
+    event.preventDefault();
     event.currentTarget.focus();
   }
 
@@ -71,6 +83,7 @@ export function Card({ card }: { card: CardType }) {
     if (cardContentRef.current) {
       cardContentRef.current.focus();
       moveCursorToEnd(cardContentRef.current);
+      setIsCardContentFocused(true);
     }
     event.stopPropagation();
   }
@@ -85,6 +98,7 @@ export function Card({ card }: { card: CardType }) {
 
   function onCardBlur() {
     cardContentRef.current?.blur();
+    setIsCardContentFocused(false);
   }
 
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -92,6 +106,11 @@ export function Card({ card }: { card: CardType }) {
       cardContentRef.current.blur();
     }
   }
+
+  console.log(
+    "is card content focused",
+    document.activeElement === cardContentRef.current
+  );
 
   return (
     <div
@@ -117,6 +136,9 @@ export function Card({ card }: { card: CardType }) {
         suppressContentEditableWarning
         ref={cardContentRef}
         onInput={handleInput}
+        style={{
+          cursor: isCardContentFocused ? "text" : "default",
+        }}
       >
         {card.text}
       </span>
