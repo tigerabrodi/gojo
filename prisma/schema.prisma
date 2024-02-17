@@ -13,7 +13,7 @@ datasource db {
 model User {
   id          String        @id @default(uuid())
   email       String        @unique
-  name        String?
+  name        String
   Password    Password?
   boardRoles  BoardRole[]   // Relation to track user roles on boards
 }
@@ -43,6 +43,7 @@ model BoardRole {
   boardId  String
   user     User     @relation(fields: [userId], references: [id])
   userId   String
+  addedAt DateTime @default(now())
 
   @@unique([boardId, userId]) // Ensure one role per user per board
 }
