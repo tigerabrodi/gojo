@@ -25,6 +25,7 @@
     height: 100%;
     width: 100%;
     padding: 4px;
+    line-height: 1.25;
 
     scrollbar-width: thin;
     scrollbar-color: var(--colors-primary-700);
