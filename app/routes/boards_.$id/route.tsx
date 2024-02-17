@@ -22,12 +22,11 @@ import { createPortal } from "react-dom";
 import { updateBoardLastOpenedAt, updateBoardName } from "./queries";
 import { useDebounceFetcher } from "remix-utils/use-debounce-fetcher";
 import type { CardType } from "~/helpers";
-import { FORM_INTENTS, INTENT } from "~/helpers";
+import { FORM_INTENTS, INTENT, checkUserAllowedToEditBoard } from "~/helpers";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
 import type { MouseEvent } from "react";
 import { v1 } from "uuid";
-import { checkUserAllowedToEditBoard } from "./validate";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -184,7 +183,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
     boardId,
   });
 
-  // If this ever happens, likely API request
+  // If this ever happens, likely API request, because we currently only support editor role
+  // No "Read only" role yet
   // Simply throw 403 authorization error
   if (!isUserAllowedToEditBoard) {
     return json(
