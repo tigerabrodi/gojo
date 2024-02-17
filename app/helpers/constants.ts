@@ -4,6 +4,7 @@ export const FORM_INTENTS = {
   createBoard: "createBoard",
   addPerson: "addPerson",
   updateBoardName: "updateBoardName",
+  shareBoard: "shareBoard",
 } as const;
 
 export const INTENT = "intent";
