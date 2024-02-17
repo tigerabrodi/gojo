@@ -6,7 +6,7 @@ import type {
 import { json } from "@vercel/remix";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { RoomProvider, useMutation, useStorage } from "~/liveblocks.config";
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { ClientSideSuspense } from "@liveblocks/react";
@@ -124,6 +124,8 @@ function Board() {
   return (
     <>
       <main onDoubleClick={createNewCard}>
+        {/* This is for screen readers */}
+        <h1 className="sr-only">Board name: {boardName}</h1>
         {cards.map((card) => (
           <Card key={card.id} card={card} />
         ))}
@@ -143,7 +145,7 @@ function Board() {
           />
           <Link
             to={`/boards/${boardId}/share`}
-            // prefetch="render"
+            prefetch="render"
             className="portal-board-share-link"
           >
             Share
@@ -151,6 +153,8 @@ function Board() {
         </>,
         navigationPortal
       )}
+
+      <Outlet />
     </>
   );
 }
