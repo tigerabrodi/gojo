@@ -63,22 +63,25 @@ main {
 
   form {
     position: fixed;
-    bottom: 40px;
-    right: 40px;
+    bottom: 35px;
+    right: 35px;
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       border-radius: 1000px;
       background-color: var(--colors-white);
       border: 3px solid var(--colors-primary-700);
       box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.5), 0px 4px 4px rgba(0, 0, 0, 0.2),
         0px 8px 8px rgba(0, 0, 0, 0.1);
 
-      svg path {
-        fill: var(--colors-primary-700);
+      svg {
+        width: 28px;
+        path {
+          fill: var(--colors-primary-700);
+        }
       }
     }
   }
