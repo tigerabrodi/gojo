@@ -17,6 +17,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const session = liveblocks.prepareSession(user.id, {
     userInfo: {
       email: user.email,
+      name: user.name,
     },
   });
 

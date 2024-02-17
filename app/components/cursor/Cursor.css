@@ -1,0 +1,22 @@
+.cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+
+  svg {
+    width: 20px;
+  }
+
+  span {
+    padding: 6px 8px;
+    background-color: var(--colors-cursor);
+    color: var(--colors-primary-700);
+    display: block;
+    font-size: calc(1rem * 12 / 16);
+    border-radius: 50px;
+    font-weight: 700;
+  }
+}

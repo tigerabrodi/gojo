@@ -7,7 +7,13 @@ import { json } from "@vercel/remix";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { RoomProvider, useMutation, useStorage } from "~/liveblocks.config";
+import {
+  RoomProvider,
+  useMutation,
+  useMyPresence,
+  useOthers,
+  useStorage,
+} from "~/liveblocks.config";
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { ClientSideSuspense } from "@liveblocks/react";
 import styles from "./styles.css";
@@ -17,16 +23,20 @@ import {
   Card,
   NAVIGATION_PORTAL_ID,
   cardLinks,
+  cursorLinks,
+  Cursor,
 } from "~/components";
 import { createPortal } from "react-dom";
 import { updateBoardLastOpenedAt, updateBoardName } from "./queries";
 import { useDebounceFetcher } from "remix-utils/use-debounce-fetcher";
 import type { CardType } from "~/helpers";
-import { FORM_INTENTS, INTENT, checkUserAllowedToEditBoard } from "~/helpers";
+import { FORM_INTENTS, INTENT } from "~/helpers";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
 import type { MouseEvent } from "react";
 import { v1 } from "uuid";
+import { checkUserAllowedToEditBoard, getUserFromDB } from "~/db";
+import { COLORS } from "./constants";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -35,10 +45,11 @@ export const handle = {
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   ...cardLinks(),
+  ...cursorLinks(),
 ];
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  await requireAuthCookie(request);
+  const userId = await requireAuthCookie(request);
 
   const boardId = params.id;
 
@@ -46,8 +57,13 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   await updateBoardLastOpenedAt(boardId);
 
+  const user = await getUserFromDB(userId);
+
+  invariant(user, "User not found");
+
   return json({
     boardId,
+    userName: user.name,
   });
 }
 
@@ -60,12 +76,12 @@ function SuspenseFallback() {
 }
 
 export default function BoardRoute() {
-  const { boardId } = useLoaderData<typeof loader>();
+  const { boardId, userName } = useLoaderData<typeof loader>();
 
   return (
     <RoomProvider
       id={boardId}
-      initialPresence={{ cursor: null }}
+      initialPresence={{ cursor: null, name: userName }}
       initialStorage={{
         cards: new LiveList(),
         boardName: "Untitled board",
@@ -81,8 +97,11 @@ export default function BoardRoute() {
 function Board() {
   const { boardId } = useLoaderData<typeof loader>();
   const fetcher = useDebounceFetcher();
+
   const boardName = useStorage((root) => root.boardName);
   const cards = useStorage((root) => root.cards);
+  const others = useOthers();
+  const [{ cursor }, updateMyPresence] = useMyPresence();
 
   function handleUpdateBoardName() {
     const formData = new FormData();
@@ -122,12 +141,43 @@ function Board() {
 
   return (
     <>
-      <main onDoubleClick={createNewCard}>
+      <main
+        onDoubleClick={createNewCard}
+        onPointerMove={(event) => {
+          updateMyPresence({
+            cursor: {
+              x: Math.round(event.clientX),
+              y: Math.round(event.clientY),
+            },
+          });
+        }}
+        onPointerLeave={() =>
+          updateMyPresence({
+            cursor: null,
+          })
+        }
+      >
         {/* This is for screen readers */}
         <h1 className="sr-only">Board name: {boardName}</h1>
         {cards.map((card) => (
           <Card key={card.id} card={card} />
         ))}
+
+        {others.map(({ connectionId, presence }) => {
+          if (presence.cursor === null) {
+            return null;
+          }
+
+          return (
+            <Cursor
+              key={`cursor-${connectionId}`}
+              color={COLORS[connectionId % COLORS.length]}
+              x={presence.cursor.x}
+              y={presence.cursor.y}
+              name={presence.name}
+            />
+          );
+        })}
       </main>
 
       {createPortal(
