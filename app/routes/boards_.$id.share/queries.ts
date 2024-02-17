@@ -36,9 +36,10 @@ export async function getAllBoardRoles(boardId: string) {
     include: {
       user: true,
     },
+    orderBy: {
+      addedAt: "asc",
+    },
   });
-
-  // we need email, name, role and boardrole id
 
   const boardRoles = result.map((boardRole) => {
     return {
@@ -46,6 +47,7 @@ export async function getAllBoardRoles(boardId: string) {
       name: boardRole.user.name,
       role: boardRole.role,
       boardRoleId: boardRole.id,
+      addedAt: boardRole.addedAt,
     };
   });
 

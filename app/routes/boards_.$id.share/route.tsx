@@ -9,7 +9,7 @@ import {
 } from "@remix-run/react";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
-import { FORM_INTENTS, INTENT, checkUserAllowedToEditBoard } from "~/helpers";
+import { FORM_INTENTS, INTENT } from "~/helpers";
 import type { SubmissionResult } from "@conform-to/react";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { json, redirect } from "@vercel/remix";
@@ -23,6 +23,7 @@ import { Close } from "~/icons";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
 import { addNewBoardMember, getAllBoardRoles } from "./queries";
+import { checkUserAllowedToEditBoard } from "~/db";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -111,11 +112,11 @@ export default function BoardShareRoute() {
             {allExistingBoardRoles.map((boardRole) => (
               <li key={boardRole.boardRoleId}>
                 <div>
-                  <h4>Tiger Abrodi</h4>
-                  <p>tiger@gmail.com</p>
+                  <h4>{boardRole.name}</h4>
+                  <p>{boardRole.email}</p>
                 </div>
 
-                <span>Owner</span>
+                <span>{boardRole.role}</span>
               </li>
             ))}
           </ul>

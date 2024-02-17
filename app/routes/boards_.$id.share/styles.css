@@ -120,7 +120,8 @@
     .members-list {
       display: flex;
       flex-direction: column;
-      row-gap: 20px;
+      row-gap: 24px;
+
       .header {
         display: flex;
         flex-direction: column;
@@ -142,7 +143,7 @@
       ul {
         display: flex;
         flex-direction: column;
-        row-gap: 14px;
+        row-gap: 16px;
         li {
           display: flex;
           justify-content: space-between;
