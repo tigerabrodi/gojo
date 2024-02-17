@@ -128,7 +128,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return submission.reply();
   }
 
-  const { email, password, confirmPassword } = submission.value;
+  const { email, password, name, confirmPassword } = submission.value;
 
   if (password !== confirmPassword) {
     return submission.reply({
@@ -148,7 +148,11 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
 
-  let user = await createUser(email, password);
+  let user = await createUser({
+    email,
+    password,
+    name,
+  });
   // TODO: Toast message
   return setAuthOnResponse(redirect("/boards"), user.id);
 }

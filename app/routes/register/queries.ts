@@ -1,7 +1,15 @@
 import crypto from "crypto";
 import { prisma } from "~/db";
 
-export async function createUser(email: string, password: string) {
+export async function createUser({
+  email,
+  password,
+  name,
+}: {
+  email: string;
+  name: string;
+  password: string;
+}) {
   let salt = crypto.randomBytes(16).toString("hex");
   let hash = crypto
     .pbkdf2Sync(password, salt, 1000, 64, "sha256")
@@ -9,7 +17,8 @@ export async function createUser(email: string, password: string) {
 
   return prisma.user.create({
     data: {
-      email: email,
+      email,
+      name,
       Password: {
         create: {
           hash,
