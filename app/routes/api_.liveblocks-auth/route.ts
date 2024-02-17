@@ -28,6 +28,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (!role) {
     // TODO: Toast message
+    // User is not allowed to be in the room
     return redirect("/", { status: 403 });
   }
 
