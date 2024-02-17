@@ -3,26 +3,59 @@ import {
   Form,
   Link,
   useActionData,
+  useLoaderData,
   useNavigate,
   useNavigation,
 } from "@remix-run/react";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
-import { FORM_INTENTS, INTENT } from "~/helpers";
+import { FORM_INTENTS, INTENT, checkUserAllowedToEditBoard } from "~/helpers";
+import type { SubmissionResult } from "@conform-to/react";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
-import type { LinksFunction } from "@vercel/remix";
+import { json, redirect } from "@vercel/remix";
+import type {
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
+  LinksFunction,
+} from "@vercel/remix";
 import styles from "./styles.css";
 import { Close } from "~/icons";
+import { requireAuthCookie } from "~/auth";
+import { invariant } from "@epic-web/invariant";
+import { addNewBoardMember, getAllBoardRoles } from "./queries";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const userId = await requireAuthCookie(request);
+  const boardId = params.id;
+
+  invariant(boardId, "No board ID provided");
+
+  const isUserAllowedToEditBoard = await checkUserAllowedToEditBoard({
+    userId,
+    boardId,
+  });
+
+  if (!isUserAllowedToEditBoard) {
+    throw redirect("/boards", { status: 403 });
+  }
+
+  const allExistingBoardRoles = await getAllBoardRoles(boardId);
+
+  return json({ allExistingBoardRoles });
+};
 
 export default function BoardShareRoute() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const lastResult = useActionData<typeof action>();
+  const { allExistingBoardRoles } = useLoaderData<typeof loader>();
 
   const [form, fields] = useForm({
-    lastResult,
+    // We throw 403 json from action if user is not allowed to edit board
+    // Happens only on API requests
+    lastResult: lastResult as SubmissionResult<string[]>,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema });
     },
@@ -75,14 +108,16 @@ export default function BoardShareRoute() {
           </div>
 
           <ul>
-            <li>
-              <div>
-                <h4>Tiger Abrodi</h4>
-                <p>tiger@gmail.com</p>
-              </div>
+            {allExistingBoardRoles.map((boardRole) => (
+              <li key={boardRole.boardRoleId}>
+                <div>
+                  <h4>Tiger Abrodi</h4>
+                  <p>tiger@gmail.com</p>
+                </div>
 
-              <span>Owner</span>
-            </li>
+                <span>Owner</span>
+              </li>
+            ))}
           </ul>
         </div>
       </Dialog.Panel>
@@ -94,12 +129,48 @@ const schema = z.object({
   email: z.string().email(),
 });
 
-export async function action({ request }: { request: Request }) {
+export async function action({ request, params }: ActionFunctionArgs) {
+  const userId = await requireAuthCookie(request);
+
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema });
 
   if (submission.status !== "success") {
     return submission.reply();
+  }
+
+  const boardId = params.id;
+
+  invariant(boardId, "No board ID provided");
+
+  const isUserAllowedToEditBoard = await checkUserAllowedToEditBoard({
+    userId,
+    boardId,
+  });
+
+  // If this ever happens, likely API request, because we currently only support editor role
+  // No "Read only" role yet
+  // Simply throw 403 authorization error
+  if (!isUserAllowedToEditBoard) {
+    return json(
+      { message: "You are not allowed to edit this board" },
+      { status: 403 }
+    );
+  }
+
+  const { email } = submission.value;
+
+  const result = await addNewBoardMember({
+    email,
+    boardId,
+  });
+
+  if (!result.success) {
+    return submission.reply({
+      fieldErrors: {
+        email: [result.message],
+      },
+    });
   }
 
   return submission.reply();
