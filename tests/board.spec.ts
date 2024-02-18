@@ -45,19 +45,21 @@ test("Test board collaboration", async ({ browser }) => {
 
   // User 1 creates card
   await user1Page.dblclick("main");
-  await user1Page.getByRole("button", { name: "1st card" }).isVisible();
   await user1Page
-    .getByRole("textbox", { name: "content of 1st card" })
+    .getByRole("button", { name: "1st card", exact: true })
+    .isVisible();
+  await user1Page
+    .getByRole("textbox", { name: "content of 1st card", exact: true })
     .isVisible();
 
   const initialCardContent = await user1Page
-    .getByRole("textbox", { name: "content of 1st card" })
+    .getByRole("textbox", { name: "content of 1st card", exact: true })
     .innerText();
   expect(initialCardContent).toBe("");
 
   // Make sure card is focused on creation
   const isFocused = await user1Page
-    .getByRole("textbox", { name: "content of 1st card" })
+    .getByRole("textbox", { name: "content of 1st card", exact: true })
     .evaluate((el) => {
       return document.activeElement === el;
     });
@@ -70,7 +72,7 @@ test("Test board collaboration", async ({ browser }) => {
 
   // Make sure card content is updated
   const finalFirstCardContent = await user1Page
-    .getByRole("textbox", { name: "content of 1st card" })
+    .getByRole("textbox", { name: "content of 1st card", exact: true })
     .innerText();
   expect(finalFirstCardContent).toBe(board.cards.firstCardContent);
 
@@ -112,14 +114,17 @@ test("Test board collaboration", async ({ browser }) => {
 
   await user2Page.reload();
   await user2Page.getByRole("link", { name: board.name }).click();
-  await user2Page.getByRole("button", { name: "1st card" }).isVisible();
   await user2Page
-    .getByRole("textbox", { name: "content of 1st card" })
+    .getByRole("button", { name: "1st card", exact: true })
+    .isVisible();
+  await user2Page
+    .getByRole("textbox", { name: "content of 1st card", exact: true })
     .isVisible();
 
   // Get initial position of the card for User 1
   const firstCardForUser1Page = user1Page.getByRole("button", {
     name: "1st card",
+    exact: true,
   });
   const initialCardUser1Position = await firstCardForUser1Page.boundingBox();
 
@@ -130,6 +135,7 @@ test("Test board collaboration", async ({ browser }) => {
   // Perform the drag-and-drop operation with User 2
   const firstCardForUser2Page = user2Page.getByRole("button", {
     name: "1st card",
+    exact: true,
   });
 
   // Drag the card a bit to the right and down for User 2
@@ -171,6 +177,25 @@ test("Test board collaboration", async ({ browser }) => {
   // Assert that the card's position for User 1 and User 2 are the same after the drag operation
   expect(newCardUser1Position.x).toBe(newCardUser2Position.x);
   expect(newCardUser1Position.y).toBe(newCardUser2Position.y);
+
+  // User 2 deletes the card
+  await user1Page
+    .getByRole("button", { name: "1st card", exact: true })
+    .isVisible();
+  await user2Page
+    .getByRole("button", { name: "1st card", exact: true })
+    .click();
+  await user2Page
+    .getByRole("button", { name: "delete 1st card", exact: true })
+    .click();
+
+  // Card should be deleted for both users
+  await expect(
+    user1Page.getByRole("button", { name: "1st card", exact: true })
+  ).toHaveCount(0);
+  await expect(
+    user2Page.getByRole("button", { name: "1st card", exact: true })
+  ).toHaveCount(0);
 
   // Cleanup
   await user1Context.close();
