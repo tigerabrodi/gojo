@@ -6,7 +6,7 @@ import type {
 import { json } from "@vercel/remix";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import {
   RoomProvider,
   useMutation,
@@ -28,12 +28,11 @@ import {
 } from "~/components";
 import { createPortal } from "react-dom";
 import { updateBoardLastOpenedAt, updateBoardName } from "./queries";
-import { useDebounceFetcher } from "remix-utils/use-debounce-fetcher";
 import type { CardType } from "~/helpers";
 import { FORM_INTENTS, INTENT } from "~/helpers";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
-import type { MouseEvent } from "react";
+import { useEffect, type MouseEvent, useRef } from "react";
 import { v1 } from "uuid";
 import { checkUserAllowedToEditBoard, getUserFromDB } from "~/db";
 import { COLORS } from "./constants";
@@ -96,20 +95,34 @@ export default function BoardRoute() {
 
 function Board() {
   const { boardId } = useLoaderData<typeof loader>();
-  const fetcher = useDebounceFetcher();
+  const fetcher = useFetcher();
 
   const boardName = useStorage((root) => root.boardName);
+  const lastSubmittedBoardName = useRef(boardName);
   const cards = useStorage((root) => root.cards);
   const others = useOthers();
   const [{ cursor }, updateMyPresence] = useMyPresence();
 
-  function handleUpdateBoardName() {
-    const formData = new FormData();
-    formData.append("boardName", boardName);
-    formData.append(INTENT, FORM_INTENTS.updateBoardName);
+  useEffect(() => {
+    if (boardName === lastSubmittedBoardName.current) {
+      return;
+    }
 
-    fetcher.submit(formData, { debounceTimeout: 2000, method: "post" });
-  }
+    const handler = setTimeout(() => {
+      const formData = new FormData();
+      formData.append("boardName", boardName);
+      formData.append(INTENT, FORM_INTENTS.updateBoardName);
+
+      fetcher.submit(formData, {
+        method: "post",
+      });
+
+      // Update lastSubmittedBoardName after submitting
+      lastSubmittedBoardName.current = boardName;
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [boardName, fetcher]);
 
   const updateBoardName = useMutation(({ storage }, newBoardName: string) => {
     storage.set("boardName", newBoardName);
@@ -117,12 +130,19 @@ function Board() {
 
   const navigationPortal = document.getElementById(NAVIGATION_PORTAL_ID)!;
 
+  function focusOnNewCardContent(cardId: string) {
+    setTimeout(() => {
+      const newCardElement = document.getElementById(cardId)!;
+      const editableSpan = newCardElement.querySelector(
+        "[contentEditable]"
+      ) as HTMLSpanElement;
+      editableSpan.focus();
+    }, 10);
+  }
+
   const createNewCard = useMutation(
     ({ storage }, event: MouseEvent<HTMLElement>) => {
       const newId = v1();
-
-      console.log("event.clientX", event.clientX);
-      console.log("event.clientY", event.clientY);
 
       const positionX = event.clientX - CARD_DIMENSIONS.width / 2;
       const positionY = event.clientY - CARD_DIMENSIONS.height;
@@ -135,6 +155,7 @@ function Board() {
       };
 
       storage.get("cards").push(new LiveObject(newCard));
+      focusOnNewCardContent(newId);
     },
     []
   );
@@ -159,8 +180,8 @@ function Board() {
       >
         {/* This is for screen readers */}
         <h1 className="sr-only">Board name: {boardName}</h1>
-        {cards.map((card) => (
-          <Card key={card.id} card={card} />
+        {cards.map((card, index) => (
+          <Card key={card.id} index={index} card={card} />
         ))}
 
         {others.map(({ connectionId, presence }) => {
@@ -189,7 +210,6 @@ function Board() {
             value={boardName}
             onChange={(event) => {
               updateBoardName(event.target.value);
-              handleUpdateBoardName();
             }}
           />
           <Link
