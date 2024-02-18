@@ -11,6 +11,22 @@ export function createRandomUser() {
   };
 }
 
+export function createRandomBoard() {
+  return {
+    name: faker.lorem.words(3),
+    cards: {
+      firstCardContent: faker.lorem.words(2),
+      secondCardContent: faker.lorem.words(2),
+      thirdCardContent: faker.lorem.words(2),
+      fourthCardContent: faker.lorem.words(2),
+      fifthCardContent: faker.lorem.words(2),
+      sixthCardContent: faker.lorem.words(2),
+      seventhCardContent: faker.lorem.words(2),
+      eighthCardContent: faker.lorem.words(2),
+    },
+  };
+}
+
 export async function createAccount({
   email,
   password,
