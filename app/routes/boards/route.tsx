@@ -35,7 +35,10 @@ export default function Boards() {
         <ul>
           {boards.map((board) => (
             <li key={board.id}>
-              <Link to={`/boards/${board.id}`}>
+              <Link
+                to={`/boards/${board.id}`}
+                aria-label={board.name || "Untitled board"}
+              >
                 <span className="name">{board.name || "Untitled"}</span>
                 <span className="date">
                   Last opened: {board.lastOpenedAt ?? "Not yet"}
