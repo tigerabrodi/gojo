@@ -105,7 +105,7 @@ export async function action({ request }: { request: Request }) {
   if (!userId) {
     return submission.reply({
       fieldErrors: {
-        email: ["Invalid email or password"],
+        email: ["Invalid email or password."],
       },
     });
   }
