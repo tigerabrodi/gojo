@@ -7,6 +7,7 @@ import type { LinksFunction } from "@vercel/remix";
 import { moveCursorToEnd } from "./utils";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
+import { formatOrdinals } from "~/helpers/functions";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -17,7 +18,7 @@ export const cardLinks: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
 ];
 
-export function Card({ card }: { card: CardType }) {
+export function Card({ card, index }: { card: CardType; index: number }) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
@@ -131,6 +132,8 @@ export function Card({ card }: { card: CardType }) {
       role="button"
       tabIndex={0}
       className="card"
+      id={card.id}
+      aria-label={`${formatOrdinals(index + 1)} card`}
       onDoubleClick={onDoubleClick}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -145,11 +148,14 @@ export function Card({ card }: { card: CardType }) {
         height: CARD_DIMENSIONS.height,
       }}
     >
-      <span
+      <div
         contentEditable
         suppressContentEditableWarning
+        role="textbox"
+        aria-label={`content of ${formatOrdinals(index + 1)} card`}
         ref={cardContentRef}
         onInput={handleInput}
+        className="card-content"
         onFocus={() => {
           scrollToTheBottomOfCardContent();
         }}
@@ -158,7 +164,7 @@ export function Card({ card }: { card: CardType }) {
         }}
       >
         {card.text}
-      </span>
+      </div>
 
       <Toolbar.Root className="toolbar">
         <Toolbar.Button aria-label="Delete" onClick={() => onDelete(card.id)}>
