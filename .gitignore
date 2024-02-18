@@ -5,3 +5,9 @@ node_modules
 /public/build
 .env
 .vercel
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+playwright/.auth

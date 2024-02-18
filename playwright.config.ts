@@ -12,6 +12,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
   globalTeardown: "./tests/global.teardown.ts",
+
   /* Run tests in files in parallel */
   fullyParallel: false, // Changed from true to false to slow down the test execution
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -40,14 +41,11 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: "setup db",
-      testMatch: /global\.setup\.ts/,
-    },
+    { name: "setup", testMatch: /.*\.setup\.ts/ },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      dependencies: ["setup db"], // Correctly specifies dependency on the setup project
+      dependencies: ["setup"], // Correctly specifies dependency on the setup project
     },
   ],
 
