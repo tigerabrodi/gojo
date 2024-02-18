@@ -13,7 +13,7 @@ export async function createBoard(
 
     await tx.boardRole.create({
       data: {
-        role: "owner",
+        role: "Owner",
         boardId: board.id,
         userId: userId,
       },

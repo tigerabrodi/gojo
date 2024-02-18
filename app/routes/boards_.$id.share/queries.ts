@@ -19,7 +19,7 @@ export async function addNewBoardMember({
 
   await prisma.boardRole.create({
     data: {
-      role: "editor",
+      role: "Editor",
       userId: user.id,
       boardId,
     },
