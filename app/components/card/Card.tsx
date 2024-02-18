@@ -167,7 +167,10 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       </div>
 
       <Toolbar.Root className="toolbar">
-        <Toolbar.Button aria-label="Delete" onClick={() => onDelete(card.id)}>
+        <Toolbar.Button
+          aria-label={`delete ${formatOrdinals(index + 1)} card`}
+          onClick={() => onDelete(card.id)}
+        >
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
