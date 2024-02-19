@@ -12,7 +12,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { FORM_INTENTS, INTENT } from "~/helpers";
 import type { SubmissionResult } from "@conform-to/react";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
-import { json, redirect } from "@vercel/remix";
+import { json } from "@vercel/remix";
 import type {
   LoaderFunctionArgs,
   ActionFunctionArgs,
@@ -24,7 +24,7 @@ import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
 import { addNewBoardMember, getAllBoardRoles } from "./queries";
 import { checkUserAllowedToEditBoard } from "~/db";
-import { jsonWithSuccess } from "remix-toast";
+import { jsonWithSuccess, redirectWithError } from "remix-toast";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -40,7 +40,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   });
 
   if (!isUserAllowedToEditBoard) {
-    throw redirect("/boards", { status: 403 });
+    throw redirectWithError("/boards", {
+      message:
+        "Something went wrong. You are not allowed on this board at all.",
+    });
   }
 
   const allExistingBoardRoles = await getAllBoardRoles(boardId);
@@ -72,7 +75,7 @@ export default function BoardShareRoute() {
       <div className="backdrop" aria-hidden="true" />
 
       <Dialog.Panel className="panel">
-        <Link to=".." className="close-link" aria-label="close">
+        <Link to=".." className="close-link" aria-label="Close dialog">
           <Close />
         </Link>
         <div className="panel-header">
