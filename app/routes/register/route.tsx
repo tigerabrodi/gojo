@@ -3,12 +3,12 @@ import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import type { ActionFunctionArgs, LinksFunction } from "@vercel/remix";
-import { redirect } from "@vercel/remix";
 import { redirectIfLoggedInLoader, setAuthOnResponse } from "~/auth";
 import { createUser } from "./queries";
 import { checkUserExists } from "./validate";
 import authStyles from "~/styles/auth.css";
 import { FORM_INTENTS, INTENT } from "~/helpers";
+import { redirectWithSuccess } from "remix-toast";
 
 export const loader = redirectIfLoggedInLoader;
 
@@ -153,6 +153,11 @@ export async function action({ request }: ActionFunctionArgs) {
     password,
     name,
   });
-  // TODO: Toast message
-  return setAuthOnResponse(redirect("/boards"), user.id);
+
+  return setAuthOnResponse(
+    await redirectWithSuccess("/boards", {
+      message: "Successfully created a user.",
+    }),
+    user.id
+  );
 }
