@@ -144,7 +144,10 @@ function Board() {
     ({ storage }, event: MouseEvent<HTMLElement>) => {
       const newId = v1();
 
+      // Divide by two to center the card horizontally
       const positionX = event.clientX - CARD_DIMENSIONS.width / 2;
+
+      // Subtract the height of the card to center it vertically
       const positionY = event.clientY - CARD_DIMENSIONS.height;
 
       const newCard: CardType = {
