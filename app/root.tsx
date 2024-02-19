@@ -19,12 +19,17 @@ import {
 } from "@vercel/remix";
 import { getAuthFromRequest } from "./auth/auth";
 import { Navigation, navigationLinks } from "./components";
+import { getToast } from "remix-toast";
+import { useEffect } from "react";
+import { ToastContainer, toast as notify } from "react-toastify";
+import toastStyles from "react-toastify/dist/ReactToastify.css";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-  { rel: "stylesheet", href: rootStyles },
   ...navigationLinks(),
+  { rel: "stylesheet", href: rootStyles },
   { rel: "stylesheet", href: overpassFont },
+  { rel: "stylesheet", href: toastStyles },
 ];
 
 export const meta: MetaFunction = () => {
@@ -41,13 +46,18 @@ export const meta: MetaFunction = () => {
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await getAuthFromRequest(request);
 
-  return json({
-    isAuthenticated: Boolean(userId),
-  });
+  const { toast, headers } = await getToast(request);
+  return json({ toast, isAuthenticated: Boolean(userId) }, { headers });
 }
 
 export default function App() {
-  const { isAuthenticated } = useLoaderData<typeof loader>();
+  const { isAuthenticated, toast } = useLoaderData<typeof loader>();
+
+  useEffect(() => {
+    if (toast) {
+      notify(toast.message, { type: toast.type });
+    }
+  }, [toast]);
 
   return (
     <html lang="en">
@@ -59,6 +69,7 @@ export default function App() {
       </head>
       <body>
         <Navigation isAuthenticated={isAuthenticated} />
+        <ToastContainer />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
