@@ -56,6 +56,7 @@ nav {
   #navigation-portal {
     display: flex;
     align-items: center;
+    column-gap: 60px;
     width: 100%;
 
     .portal-board-name-input {
@@ -68,17 +69,31 @@ nav {
       width: 290px;
     }
 
-    .portal-board-share-link {
-      margin-left: auto;
+    .portal-board-link {
       background-color: var(--colors-primary-200);
       border-radius: 14px;
       padding: 10px;
       border: 2px solid var(--colors-primary-700);
-      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
-      font-weight: 500;
-      color: var(--colors-primary-700);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      column-gap: 6px;
+
+      span {
+        color: var(--colors-primary-700);
+        font-weight: 500;
+      }
+
+      svg {
+        width: 18px;
+        path {
+          fill: var(--colors-primary-700);
+        }
+      }
+    }
+
+    .portal-board-share-link {
       margin-left: auto;
-      transition: all 0.1s ease-out;
     }
   }
 }
