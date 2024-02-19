@@ -10,7 +10,9 @@ main {
 
   div {
     /* wrapper styles */
-    width: 983px;
+    /* This is the width of each list item + the gap between them */
+    /* 5 list items will have 4 columns between them in total */
+    width: calc(200px * 5 + 20px * 4);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -39,6 +41,7 @@ main {
           border: 2px solid var(--colors-primary-400);
           box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25);
           transition: all 0.1s;
+          width: 200px;
 
           &:hover {
             transform: translateY(-3px);
@@ -49,6 +52,9 @@ main {
             font-weight: 500;
             font-size: calc(1rem * 18 / 16);
             color: var(--colors-primary-700);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .date {
