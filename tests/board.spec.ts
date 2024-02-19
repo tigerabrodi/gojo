@@ -96,7 +96,10 @@ test("Test board collaboration", async ({ browser }) => {
   await shareDialog.getByText(user2.email).isVisible();
   await shareDialog.getByText("Owner").isVisible();
   await shareDialog.getByText("Editor", { exact: true }).isVisible();
-  await shareDialog.getByRole("link", { name: "close" }).click();
+
+  await user1Page.getByRole("button", { name: "close", exact: true }).click();
+
+  await shareDialog.getByRole("link", { name: "Close dialog" }).click();
 
   // Update board name
   await user1Page.getByLabel("Enter name of board").clear();
@@ -196,6 +199,22 @@ test("Test board collaboration", async ({ browser }) => {
   await expect(
     user2Page.getByRole("button", { name: "1st card", exact: true })
   ).toHaveCount(0);
+
+  // Owner deletes board
+  await user1Page.getByRole("link", { name: "Delete board" }).click();
+  await user1Page.getByRole("button", { name: "Delete" }).click();
+
+  // Both users redirected to /boards
+  await user1Page.waitForURL("/boards");
+  await user2Page.waitForURL("/boards");
+
+  // Board should not be visible for both users
+  await expect(user1Page.getByRole("link", { name: board.name })).toHaveCount(
+    0
+  );
+  await expect(user2Page.getByRole("link", { name: board.name })).toHaveCount(
+    0
+  );
 
   // Cleanup
   await user1Context.close();
