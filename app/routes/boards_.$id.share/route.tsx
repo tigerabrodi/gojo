@@ -24,6 +24,7 @@ import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
 import { addNewBoardMember, getAllBoardRoles } from "./queries";
 import { checkUserAllowedToEditBoard } from "~/db";
+import { jsonWithSuccess } from "remix-toast";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -174,5 +175,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     });
   }
 
-  return submission.reply();
+  return jsonWithSuccess(submission.reply(), {
+    message: "Successfully added member to board.",
+  });
 }
