@@ -1,0 +1,86 @@
+.delete-dialog {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  z-index: 10;
+
+  .backdrop {
+    background-color: rgba(0 0 0 / 0.7);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+  }
+
+  .panel {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    max-height: 400px;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--colors-white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    row-gap: 50px;
+    padding: 40px 50px;
+
+    .panel-header {
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
+
+      h2 {
+        font-size: calc(1rem * 26 / 16);
+        font-weight: 700;
+        color: var(--colors-primary-700);
+      }
+
+      p {
+        font-weight: 400;
+        font-size: calc(1rem * 16 / 16);
+        color: var(--colors-primary-400);
+      }
+    }
+
+    .close-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    form {
+      display: flex;
+      column-gap: 40px;
+      align-items: center;
+      justify-content: end;
+      margin-top: auto;
+
+      a {
+        font-weight: 500;
+        color: var(--colors-primary-700);
+      }
+
+      button {
+        font-weight: 500;
+        font-size: calc(1rem * 18 / 16);
+        color: var(--colors-primary-700);
+        border: 2px solid var(--colors-primary-700);
+        background-color: var(--colors-primary-200);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        border-radius: 2px;
+        padding: 8px 12px;
+      }
+    }
+  }
+}

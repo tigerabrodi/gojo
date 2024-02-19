@@ -24,6 +24,10 @@ type UserMeta = {
   };
 };
 
+export type RoomEvent = {
+  type: "board-deleted";
+};
+
 export const {
   suspense: {
     RoomProvider,
@@ -33,5 +37,6 @@ export const {
     useStorage,
     useMutation,
     useStatus,
+    useEventListener,
   },
-} = createRoomContext<Presence, Storage, UserMeta>(client);
+} = createRoomContext<Presence, Storage, UserMeta, RoomEvent>(client);

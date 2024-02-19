@@ -6,9 +6,16 @@ import type {
 import { json } from "@vercel/remix";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
-import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import {
   RoomProvider,
+  useEventListener,
   useMutation,
   useMyPresence,
   useOthers,
@@ -17,7 +24,7 @@ import {
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { ClientSideSuspense } from "@liveblocks/react";
 import styles from "./styles.css";
-import { Kakashi } from "~/icons";
+import { Kakashi, People, Trash } from "~/icons";
 import {
   CARD_DIMENSIONS,
   Card,
@@ -34,8 +41,13 @@ import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
 import { useEffect, type MouseEvent, useRef } from "react";
 import { v1 } from "uuid";
-import { checkUserAllowedToEditBoard, getUserFromDB } from "~/db";
+import {
+  checkUserAllowedToEditBoard,
+  getUserFromDB,
+  getUserRoleForBoard,
+} from "~/db";
 import { COLORS } from "./constants";
+import { toast } from "react-toastify";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -56,13 +68,18 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   await updateBoardLastOpenedAt(boardId);
 
-  const user = await getUserFromDB(userId);
+  const [user, boardRole] = await Promise.all([
+    getUserFromDB(userId),
+    getUserRoleForBoard(userId, boardId),
+  ]);
 
   invariant(user, "User not found");
+  invariant(boardRole, "Board role not found");
 
   return json({
     boardId,
     userName: user.name,
+    userRole: boardRole.role,
   });
 }
 
@@ -94,8 +111,9 @@ export default function BoardRoute() {
 }
 
 function Board() {
-  const { boardId } = useLoaderData<typeof loader>();
+  const { boardId, userRole } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
+  const navigate = useNavigate();
 
   const boardName = useStorage((root) => root.boardName);
   const lastSubmittedBoardName = useRef(boardName);
@@ -127,6 +145,17 @@ function Board() {
   const updateBoardName = useMutation(({ storage }, newBoardName: string) => {
     storage.set("boardName", newBoardName);
   }, []);
+
+  useEventListener(({ event }) => {
+    if (event.type === "board-deleted") {
+      // Owner is the one who deleted the board
+      // Additional toast message for Owner is annoying
+      if (userRole !== "Owner") {
+        toast("This board was deleted by its owner.", { type: "info" });
+        navigate("/boards");
+      }
+    }
+  });
 
   const navigationPortal = document.getElementById(NAVIGATION_PORTAL_ID)!;
 
@@ -218,10 +247,23 @@ function Board() {
           <Link
             to={`/boards/${boardId}/share`}
             prefetch="render"
-            className="portal-board-share-link"
+            className="portal-board-share-link portal-board-link"
+            aria-label="Share"
           >
-            Share
+            <span>Share</span>
+            <People />
           </Link>
+          {userRole === "Owner" && (
+            <Link
+              to={`/boards/${boardId}/delete`}
+              prefetch="render"
+              className="portal-board-link"
+              aria-label="Delete board"
+            >
+              <span>Delete</span>
+              <Trash />
+            </Link>
+          )}
         </>,
         navigationPortal
       )}

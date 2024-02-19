@@ -7,3 +7,14 @@ export async function getUserFromDB(userId: string) {
     },
   });
 }
+
+export async function getUserRoleForBoard(userId: string, boardId: string) {
+  return await prisma.boardRole.findUnique({
+    where: {
+      boardId_userId: {
+        boardId,
+        userId,
+      },
+    },
+  });
+}
