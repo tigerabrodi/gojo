@@ -69,7 +69,7 @@ export default function App() {
       </head>
       <body>
         <Navigation isAuthenticated={isAuthenticated} />
-        <ToastContainer />
+        <ToastContainer autoClose={2500} />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
