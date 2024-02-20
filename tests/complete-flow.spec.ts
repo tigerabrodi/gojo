@@ -16,7 +16,7 @@ type User = {
   name: string;
 };
 
-test("Test board collaboration", async ({ browser }) => {
+test("Board collaboration complete simple flow", async ({ browser }) => {
   const board = createRandomBoard();
 
   // Load storage states for both users
