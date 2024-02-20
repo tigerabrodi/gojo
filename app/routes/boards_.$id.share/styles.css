@@ -173,5 +173,49 @@
         }
       }
     }
+
+    .panel-footer {
+      margin-top: auto;
+      .copy-link-wrapper {
+        display: flex;
+        flex-direction: column;
+        row-gap: 12px;
+        width: fit-content;
+        button {
+          display: flex;
+          align-items: center;
+          column-gap: 10px;
+          padding: 10px 16px;
+          border: 2px solid var(--colors-primary-700);
+          border-radius: 50px;
+          background-color: var(--colors-white);
+          width: fit-content;
+
+          &:hover {
+            background-color: var(--colors-primary-200);
+          }
+
+          svg {
+            width: 18px;
+            path {
+              fill: var(--colors-primary-700);
+            }
+          }
+
+          span {
+            color: var(--colors-primary-700);
+            font-weight: 500;
+            font-size: calc(1rem * 16 / 16);
+          }
+        }
+
+        p {
+          font-weight: 400;
+          font-size: calc(1rem * 14 / 16);
+          color: var(--colors-primary-400);
+          margin-left: 2px;
+        }
+      }
+    }
   }
 }

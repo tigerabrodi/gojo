@@ -19,13 +19,14 @@ import type {
   LinksFunction,
 } from "@vercel/remix";
 import styles from "./styles.css";
-import { Close } from "~/icons";
+import { Close, Link as LinkIcon } from "~/icons";
 import { requireAuthCookie } from "~/auth";
 import { invariant } from "@epic-web/invariant";
-import { addNewBoardMember, getAllBoardRoles } from "./queries";
+import { addNewBoardMember, getAllBoardRoles, getBoardById } from "./queries";
 import { checkUserAllowedToEditBoard } from "~/db";
 import { jsonWithSuccess, redirectWithError } from "remix-toast";
 import { useEffect } from "react";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -47,16 +48,29 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     });
   }
 
-  const allExistingBoardRoles = await getAllBoardRoles(boardId);
+  const [allExistingBoardRoles, board] = await Promise.all([
+    getAllBoardRoles(boardId),
+    getBoardById(boardId),
+  ]);
 
-  return json({ allExistingBoardRoles });
+  invariant(board, "No board found");
+
+  const baseUrl = new URL(request.url);
+  const boardUrl = new URL(`${baseUrl.origin}/boards/${params.id}`);
+  boardUrl.searchParams.set("secretId", board.secretId);
+  const shareLink = boardUrl.toString();
+
+  return json({ allExistingBoardRoles, shareLink });
 };
 
 export default function BoardShareRoute() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const lastResult = useActionData<typeof action>();
-  const { allExistingBoardRoles } = useLoaderData<typeof loader>();
+  const [copiedText, copyToClipboard] = useCopyToClipboard();
+  const hasCopiedText = Boolean(copiedText);
+
+  const { allExistingBoardRoles, shareLink } = useLoaderData<typeof loader>();
 
   const [form, fields] = useForm({
     // We throw 403 json from action if user is not allowed to edit board
@@ -133,6 +147,21 @@ export default function BoardShareRoute() {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="panel-footer">
+          <div className="copy-link-wrapper">
+            <button type="button" onClick={() => copyToClipboard(shareLink)}>
+              <LinkIcon />
+              <span>Copy link</span>
+            </button>
+
+            <p>
+              {hasCopiedText
+                ? "Copied to clipboard!"
+                : "Share link and collaborate."}{" "}
+            </p>
+          </div>
         </div>
       </Dialog.Panel>
     </Dialog>

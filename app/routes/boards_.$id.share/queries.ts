@@ -53,3 +53,13 @@ export async function getAllBoardRoles(boardId: string) {
 
   return boardRoles;
 }
+
+export async function getBoardById(boardId: string) {
+  const board = await prisma.board.findUnique({
+    where: {
+      id: boardId,
+    },
+  });
+
+  return board;
+}

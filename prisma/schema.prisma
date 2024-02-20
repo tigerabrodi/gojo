@@ -29,6 +29,7 @@ model Password {
 model Board {
   id       String      @id @default(uuid())
   name     String
+  secretId String      @default(uuid())
   roles    BoardRole[] // Relation to track user roles on this board
   lastOpenedAt DateTime?
   createdAt DateTime   @default(now())
