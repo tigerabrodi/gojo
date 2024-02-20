@@ -1,12 +1,14 @@
 import { test as setup } from "@playwright/test";
 
-import { createAccount, createRandomUser } from "./utils";
+import {
+  createAccount,
+  createRandomUser,
+  user1Details,
+  user1File,
+  user2Details,
+  user2File,
+} from "./utils";
 import fs from "fs";
-
-export const user1File = "playwright/.auth/user1.json";
-export const user2File = "playwright/.auth/user2.json";
-export const user1Details = "playwright/.auth/user1-details.json";
-export const user2Details = "playwright/.auth/user2-details.json";
 
 setup("authenticate users", async ({ browser }) => {
   console.log("Setting up users");
