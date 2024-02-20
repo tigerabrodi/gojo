@@ -1,8 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { user1Details, user1File, user2Details, user2File } from "./auth.setup";
 import fs from "fs";
 import { prisma } from "~/db";
-import { createRandomBoard } from "./utils";
+import {
+  createRandomBoard,
+  user1Details,
+  user1File,
+  user2Details,
+  user2File,
+} from "./utils";
 import { liveblocks } from "~/helpers";
 
 type User = {
@@ -86,6 +91,7 @@ test("Test board collaboration", async ({ browser }) => {
 
   await shareDialog.getByLabel("Email").fill(user2.email);
   await shareDialog.getByRole("button", { name: "add" }).click();
+  expect(shareDialog.getByLabel("Email")).toHaveValue("");
 
   await shareDialog
     .getByRole("heading", { name: "People with access" })

@@ -25,6 +25,7 @@ import { invariant } from "@epic-web/invariant";
 import { addNewBoardMember, getAllBoardRoles } from "./queries";
 import { checkUserAllowedToEditBoard } from "~/db";
 import { jsonWithSuccess, redirectWithError } from "remix-toast";
+import { useEffect } from "react";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -69,6 +70,14 @@ export default function BoardShareRoute() {
 
   const isSubmitting =
     navigation.formData?.get(INTENT) === FORM_INTENTS.shareBoard;
+
+  useEffect(() => {
+    const wasFormSubmissionSuccessful =
+      lastResult && "status" in lastResult && lastResult.status === "success";
+    if (wasFormSubmissionSuccessful) {
+      form.reset();
+    }
+  }, [form, lastResult]);
 
   return (
     <Dialog open onClose={() => navigate("..")} className="members-dialog">
