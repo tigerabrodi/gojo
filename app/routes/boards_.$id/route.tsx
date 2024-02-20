@@ -34,7 +34,11 @@ import {
   Cursor,
 } from "~/components";
 import { createPortal } from "react-dom";
-import { updateBoardLastOpenedAt, updateBoardName } from "./queries";
+import {
+  updateBoardLastOpenedAt,
+  updateBoardName,
+  upsertUserBoardRole,
+} from "./queries";
 import type { CardType } from "~/helpers";
 import { FORM_INTENTS, INTENT } from "~/helpers";
 import { z } from "zod";
@@ -48,6 +52,8 @@ import {
 } from "~/db";
 import { COLORS } from "./constants";
 import { toast } from "react-toastify";
+import { redirectWithError } from "remix-toast";
+import { checkUserAllowedToEnterBoardWithSecretId } from "./validate";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -61,10 +67,31 @@ export const links: LinksFunction = () => [
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const userId = await requireAuthCookie(request);
-
   const boardId = params.id;
 
   invariant(boardId, "No board ID provided");
+
+  const currentUrl = new URL(request.url);
+  const secretId = currentUrl.searchParams.get("secretId");
+
+  if (secretId) {
+    const isUserAllowedToEnterBoard =
+      await checkUserAllowedToEnterBoardWithSecretId({
+        boardId,
+        secretId,
+      });
+
+    if (!isUserAllowedToEnterBoard) {
+      throw redirectWithError("/boards", {
+        message: "You are not allowed on this board at all.",
+      });
+    }
+
+    await upsertUserBoardRole({
+      userId,
+      boardId,
+    });
+  }
 
   await updateBoardLastOpenedAt(boardId);
 
@@ -73,8 +100,13 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     getUserRoleForBoard(userId, boardId),
   ]);
 
+  if (!boardRole) {
+    throw redirectWithError("/boards", {
+      message: "You are not allowed on this board at all.",
+    });
+  }
+
   invariant(user, "User not found");
-  invariant(boardRole, "Board role not found");
 
   return json({
     boardId,

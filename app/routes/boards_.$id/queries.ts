@@ -27,3 +27,26 @@ export async function updateBoardName({
     },
   });
 }
+
+export async function upsertUserBoardRole({
+  userId,
+  boardId,
+}: {
+  userId: string;
+  boardId: string;
+}) {
+  await prisma.boardRole.upsert({
+    where: {
+      boardId_userId: {
+        boardId,
+        userId,
+      },
+    },
+    update: {},
+    create: {
+      boardId,
+      userId,
+      role: "Editor",
+    },
+  });
+}
