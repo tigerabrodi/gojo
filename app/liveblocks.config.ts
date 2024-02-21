@@ -11,6 +11,7 @@ type Presence = {
   cursor: { x: number; y: number } | null;
   name: string;
   selectedCardId: string | null;
+  isTyping: boolean;
 };
 
 export type Storage = {

@@ -120,7 +120,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardContent(card.id, purifiedHtml);
   }
 
-  // Use useEffect to move the cursor after content updates
+  // Move the cursor to the end of the contentEditable span when the content changes
   useEffect(() => {
     if (
       cardContentRef.current &&
@@ -186,6 +186,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           break;
       }
 
+      // Prevent the page from scrolling when using arrow keys
       event.preventDefault();
     }
   }
@@ -259,8 +260,16 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         ref={cardContentRef}
         onInput={handleInput}
         className="card-content"
+        onBlur={() => {
+          updateMyPresence({
+            isTyping: false,
+          });
+        }}
         onFocus={() => {
           scrollToTheBottomOfCardContent();
+          updateMyPresence({
+            isTyping: true,
+          });
         }}
         style={{
           cursor: isCardContentFocused ? "text" : "default",

@@ -129,7 +129,12 @@ export default function BoardRoute() {
   return (
     <RoomProvider
       id={boardId}
-      initialPresence={{ cursor: null, name: userName, selectedCardId: null }}
+      initialPresence={{
+        cursor: null,
+        name: userName,
+        selectedCardId: null,
+        isTyping: false,
+      }}
       initialStorage={{
         cards: new LiveList(),
         boardName: "Untitled board",
