@@ -30,7 +30,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
-  const [content, setContent] = useState(card.text);
+  const [content, setContent] = useState(card.html);
 
   // Needed to change the cursor to text when the card content is focused
   // To properly re-render
@@ -93,7 +93,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     ({ storage }, id: string, newHtml: string) => {
       const card = storage.get("cards").find((card) => card.get("id") === id);
       if (card) {
-        card.set("text", newHtml);
+        card.set("html", newHtml);
       }
     },
     []
@@ -198,6 +198,17 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }
 
+  const isSomeoneElseTypingOnThisCard =
+    personFocusingOnThisCard &&
+    personFocusingOnThisCard.presence.selectedCardId === card.id &&
+    personFocusingOnThisCard.presence.isTyping;
+
+  useEffect(() => {
+    if (isSomeoneElseTypingOnThisCard) {
+      scrollToTheBottomOfCardContent();
+    }
+  }, [isSomeoneElseTypingOnThisCard]);
+
   function setSelectedCardId() {
     updateMyPresence({
       selectedCardId: card.id,
@@ -253,7 +264,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       )}
 
       <div
-        contentEditable
+        contentEditable={!isSomeoneElseTypingOnThisCard}
         suppressContentEditableWarning
         role="textbox"
         aria-label={`content of ${formatOrdinals(index + 1)} card`}
@@ -274,7 +285,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         style={{
           cursor: isCardContentFocused ? "text" : "default",
         }}
-        dangerouslySetInnerHTML={{ __html: card.text }}
+        dangerouslySetInnerHTML={{
+          __html: card.html,
+        }}
       />
 
       <Toolbar.Root className="toolbar">
