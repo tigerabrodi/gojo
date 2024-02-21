@@ -1,6 +1,6 @@
 import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "~/liveblocks.config";
+import { useMutation, useMyPresence, useOthers } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
 import type { LinksFunction } from "@vercel/remix";
@@ -9,6 +9,7 @@ import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
 import { formatOrdinals } from "~/helpers/functions";
 import DOMPurify from "dompurify";
+import { COLORS } from "~/routes/boards_.$id/constants";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -30,6 +31,12 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   const [isCardContentFocused, setIsCardContentFocused] = useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
+
+  const [presence, updateMyPresence] = useMyPresence();
+  const others = useOthers();
+  const personFocusingOnThisCard = others.find(
+    (person) => person.presence.selectedCardId === card.id
+  );
 
   const updateCardPosition = useMutation(({ storage }, id, x, y) => {
     const card = storage.get("cards").find((card) => card.get("id") === id);
@@ -120,6 +127,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   function onCardBlur() {
     cardContentRef.current?.blur();
     setIsCardContentFocused(false);
+    leaveSelectedCardId();
   }
 
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -133,6 +141,18 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       // Scroll to the bottom of the contentEditable span
       cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
     }
+  }
+
+  function setSelectedCardId() {
+    updateMyPresence({
+      selectedCardId: card.id,
+    });
+  }
+
+  function leaveSelectedCardId() {
+    updateMyPresence({
+      selectedCardId: null,
+    });
   }
 
   return (
@@ -149,13 +169,33 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       onMouseLeave={handleMouseUp}
       onBlur={onCardBlur}
       onKeyDown={onCardKeyDown}
+      onFocus={setSelectedCardId}
       style={{
         top: card.positionY,
         left: card.positionX,
         width: CARD_DIMENSIONS.width,
         height: CARD_DIMENSIONS.height,
+        ...(personFocusingOnThisCard
+          ? {
+              border: `2px solid ${
+                COLORS[personFocusingOnThisCard.connectionId % COLORS.length]
+              }`,
+            }
+          : {}),
       }}
     >
+      {personFocusingOnThisCard && (
+        <div
+          className="card-presence-name"
+          style={{
+            backgroundColor:
+              COLORS[personFocusingOnThisCard.connectionId % COLORS.length],
+          }}
+        >
+          {personFocusingOnThisCard.presence.name}
+        </div>
+      )}
+
       <div
         contentEditable
         suppressContentEditableWarning

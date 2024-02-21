@@ -10,6 +10,7 @@ const client = createClient({
 type Presence = {
   cursor: { x: number; y: number } | null;
   name: string;
+  selectedCardId: string | null;
 };
 
 export type Storage = {
