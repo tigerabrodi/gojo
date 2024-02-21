@@ -218,7 +218,7 @@ function Board() {
 
       const newCard: CardType = {
         id: newId,
-        text: "",
+        html: "",
         positionX,
         positionY,
       };

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const cardSchema = z.object({
   id: z.string(),
-  text: z.string(),
+  html: z.string(),
   positionX: z.number(),
   positionY: z.number(),
 });
