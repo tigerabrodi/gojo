@@ -143,16 +143,16 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
     switch (direction) {
       case "up":
-        newY -= 5;
+        newY -= 8;
         break;
       case "down":
-        newY += 5;
+        newY += 8;
         break;
       case "left":
-        newX -= 5;
+        newX -= 8;
         break;
       case "right":
-        newX += 5;
+        newX += 8;
         break;
       default:
         break;
