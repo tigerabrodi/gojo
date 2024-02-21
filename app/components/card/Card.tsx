@@ -16,6 +16,13 @@ export const CARD_DIMENSIONS = {
   height: 200,
 } as const;
 
+const ARROW_KEYS = {
+  ArrowUp: "ArrowUp",
+  ArrowDown: "ArrowDown",
+  ArrowLeft: "ArrowLeft",
+  ArrowRight: "ArrowRight",
+} as const;
+
 export const cardLinks: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
 ];
@@ -130,9 +137,57 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     leaveSelectedCardId();
   }
 
+  function handleCardMove(direction: "up" | "down" | "left" | "right") {
+    let newX = card.positionX;
+    let newY = card.positionY;
+
+    switch (direction) {
+      case "up":
+        newY -= 5;
+        break;
+      case "down":
+        newY += 5;
+        break;
+      case "left":
+        newX -= 5;
+        break;
+      case "right":
+        newX += 5;
+        break;
+      default:
+        break;
+    }
+
+    updateCardPosition(card.id, newX, newY);
+  }
+
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
+      return;
+    }
+
+    const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
+
+    if (arrowKey) {
+      switch (event.key) {
+        case "ArrowUp":
+          handleCardMove("up");
+          break;
+        case "ArrowDown":
+          handleCardMove("down");
+          break;
+        case "ArrowLeft":
+          handleCardMove("left");
+          break;
+        case "ArrowRight":
+          handleCardMove("right");
+          break;
+        default:
+          break;
+      }
+
+      event.preventDefault();
     }
   }
 
