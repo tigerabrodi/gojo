@@ -7,9 +7,8 @@ import type { LinksFunction } from "@vercel/remix";
 import { moveCursorToEnd } from "./utils";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
-import { formatOrdinals } from "~/helpers/functions";
+import { formatOrdinals, getColorWithId } from "~/helpers/functions";
 import DOMPurify from "dompurify";
-import { COLORS } from "~/routes/boards_.$id/constants";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -143,16 +142,16 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
     switch (direction) {
       case "up":
-        newY -= 8;
+        newY -= 10;
         break;
       case "down":
-        newY += 8;
+        newY += 10;
         break;
       case "left":
-        newX -= 8;
+        newX -= 10;
         break;
       case "right":
-        newX += 8;
+        newX += 10;
         break;
       default:
         break;
@@ -232,9 +231,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         height: CARD_DIMENSIONS.height,
         ...(personFocusingOnThisCard
           ? {
-              border: `2px solid ${
-                COLORS[personFocusingOnThisCard.connectionId % COLORS.length]
-              }`,
+              border: `2px solid ${getColorWithId(
+                personFocusingOnThisCard.connectionId
+              )}`,
             }
           : {}),
       }}
@@ -243,8 +242,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         <div
           className="card-presence-name"
           style={{
-            backgroundColor:
-              COLORS[personFocusingOnThisCard.connectionId % COLORS.length],
+            backgroundColor: getColorWithId(
+              personFocusingOnThisCard.connectionId
+            ),
           }}
         >
           {personFocusingOnThisCard.presence.name}

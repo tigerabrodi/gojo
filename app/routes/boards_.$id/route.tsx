@@ -50,10 +50,10 @@ import {
   getUserFromDB,
   getUserRoleForBoard,
 } from "~/db";
-import { COLORS } from "./constants";
 import { toast } from "react-toastify";
 import { redirectWithError } from "remix-toast";
 import { checkUserAllowedToEnterBoardWithSecretId } from "./validate";
+import { getColorWithId } from "~/helpers/functions";
 
 export const handle = {
   shouldHideRootNavigation: true,
@@ -129,7 +129,7 @@ export default function BoardRoute() {
   return (
     <RoomProvider
       id={boardId}
-      initialPresence={{ cursor: null, name: userName }}
+      initialPresence={{ cursor: null, name: userName, selectedCardId: null }}
       initialStorage={{
         cards: new LiveList(),
         boardName: "Untitled board",
@@ -256,7 +256,7 @@ function Board() {
           return (
             <Cursor
               key={`cursor-${connectionId}`}
-              color={COLORS[connectionId % COLORS.length]}
+              color={getColorWithId(connectionId)}
               x={presence.cursor.x}
               y={presence.cursor.y}
               name={presence.name}
