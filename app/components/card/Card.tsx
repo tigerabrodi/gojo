@@ -1,5 +1,5 @@
 import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
@@ -8,6 +8,7 @@ import { moveCursorToEnd } from "./utils";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
 import { formatOrdinals } from "~/helpers/functions";
+import DOMPurify from "dompurify";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -21,6 +22,8 @@ export const cardLinks: LinksFunction = () => [
 export function Card({ card, index }: { card: CardType; index: number }) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+
+  const [content, setContent] = useState(card.text);
 
   // Needed to change the cursor to text when the card content is focused
   // To properly re-render
@@ -73,12 +76,15 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     setIsDragging(false);
   }
 
-  const updateCardContent = useMutation(({ storage }, id, newText) => {
-    const card = storage.get("cards").find((card) => card.get("id") === id);
-    if (card) {
-      card.set("text", newText);
-    }
-  }, []);
+  const updateCardContent = useMutation(
+    ({ storage }, id: string, newHtml: string) => {
+      const card = storage.get("cards").find((card) => card.get("id") === id);
+      if (card) {
+        card.set("text", newHtml);
+      }
+    },
+    []
+  );
 
   function onDoubleClick(event: MouseEvent<HTMLDivElement>) {
     if (cardContentRef.current) {
@@ -95,12 +101,21 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }
 
   function handleInput(event: FormEvent<HTMLSpanElement>) {
-    const newText = event.currentTarget.textContent || "";
-    updateCardContent(card.id, newText);
-    if (cardContentRef.current) {
+    const newHtml = event.currentTarget.innerHTML || "";
+    const purifiedHtml = DOMPurify.sanitize(newHtml);
+    setContent(purifiedHtml); // Update the content state
+    updateCardContent(card.id, purifiedHtml);
+  }
+
+  // Use useEffect to move the cursor after content updates
+  useEffect(() => {
+    if (
+      cardContentRef.current &&
+      document.activeElement === cardContentRef.current
+    ) {
       moveCursorToEnd(cardContentRef.current);
     }
-  }
+  }, [content]);
 
   function onCardBlur() {
     cardContentRef.current?.blur();
@@ -108,14 +123,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }
 
   function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Enter") {
-      // TODO: Deal with implementation of breaklines
-      // This is a temporary thing to prevent users from creating breaklines
-      // Currently we can't properly update the card content because it isn't included in `event.currentTarget.textContent`
-      // We can get it via `innerHTML`, but it's a dangerous due to XSS attacks
-      // We need more research on how to properly handle this
-      event.preventDefault();
-    } else if (event.key === "Escape" && cardContentRef.current) {
+    if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
     }
   }
@@ -162,9 +170,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         style={{
           cursor: isCardContentFocused ? "text" : "default",
         }}
-      >
-        {card.text}
-      </div>
+        dangerouslySetInnerHTML={{ __html: card.text }}
+      />
 
       <Toolbar.Root className="toolbar">
         <Toolbar.Button
