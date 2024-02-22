@@ -1,7 +1,7 @@
 # Gojo
 
-A web app where you can collaborate and brainstorm ideas.
-        
+A real-time collaborative brainstorming web app built with [Remix](https://remix.run/) and [Liveblocks](https://liveblocks.io/).
+
 https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e3651c46ef41
 
 # Features
