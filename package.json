@@ -3,6 +3,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "build": "remix build",
     "postinstall": "prisma generate",
