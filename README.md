@@ -24,7 +24,7 @@ https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e
 `LIVEBLOCKS_SECRET_KEY` -> setup account on Liveblocks and copy the secret private key from development environment.
 `DATABASE_URL` -> URL from a Postgres DB, I setup mine on [Railway](https://railway.app/), it's super easy.
 
-# Features
+# Features explained
 
 <details>
   <summary>🍿 Add someone as Editor via Email</summary>
@@ -394,6 +394,7 @@ Another fun thing: It uses Cloudflare Durable objects [under the hood](https://l
 
 - Remix -> Fullstack Web Framework
 - Liveblocks -> Real time collaboration service
+- Vercel -> Deployment
 - Railway -> DB hosting (postgres)
 - Conform -> Form validation
 - CSS -> Styling
