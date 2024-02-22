@@ -160,6 +160,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }, [content]);
 
   function onCardBlur(event: FocusEvent<HTMLDivElement>) {
+    // If we're focusing on card content, card's blur should not be triggered
     if (event.relatedTarget === cardContentRef.current) return;
 
     cardContentRef.current?.blur();
