@@ -33,7 +33,7 @@
     position: absolute;
     top: 0;
     right: -2px;
-    color: var(--colors-white);
+    color: var(--colors-primary-700);
     top: -25px;
     padding: 4px 10px;
     font-size: 14px;
@@ -48,8 +48,8 @@
     overflow: auto;
     outline: none;
     display: block;
-    max-height: 100%;
-    max-width: 100%;
+    height: 100%;
+    width: 100%;
     padding: 4px;
     line-height: 1.25;
 
