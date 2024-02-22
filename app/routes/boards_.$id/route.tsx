@@ -138,6 +138,7 @@ export default function BoardRoute() {
       initialStorage={{
         cards: new LiveList(),
         boardName: "Untitled board",
+        zIndexOrderListWithCardIds: new LiveList(),
       }}
     >
       <ClientSideSuspense fallback={<SuspenseFallback />}>
@@ -156,7 +157,7 @@ function Board() {
   const lastSubmittedBoardName = useRef(boardName);
   const cards = useStorage((root) => root.cards);
   const others = useOthers();
-  const [{ cursor }, updateMyPresence] = useMyPresence();
+  const [, updateMyPresence] = useMyPresence();
 
   useEffect(() => {
     if (boardName === lastSubmittedBoardName.current) {
@@ -224,6 +225,7 @@ function Board() {
       };
 
       storage.get("cards").push(new LiveObject(newCard));
+      storage.get("zIndexOrderListWithCardIds").push(newId);
       focusOnNewCardContent(newId);
     },
     []

@@ -1,6 +1,11 @@
 import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useMyPresence, useOthers } from "~/liveblocks.config";
+import {
+  useMutation,
+  useMyPresence,
+  useOthers,
+  useStorage,
+} from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
 import type { LinksFunction } from "@vercel/remix";
@@ -9,6 +14,7 @@ import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
 import { formatOrdinals, getColorWithId } from "~/helpers/functions";
 import DOMPurify from "dompurify";
+import { LiveList } from "@liveblocks/client";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -30,19 +36,24 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
+  // Needed to properly move cursor to the end of the contentEditable span
   const [content, setContent] = useState(card.html);
 
   // Needed to change the cursor to text when the card content is focused
-  // To properly re-render
   const [isCardContentFocused, setIsCardContentFocused] = useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
-  const [presence, updateMyPresence] = useMyPresence();
+  const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
   const personFocusingOnThisCard = others.find(
     (person) => person.presence.selectedCardId === card.id
   );
+
+  const zIndexOrderListWithCardIds = useStorage(
+    (root) => root.zIndexOrderListWithCardIds
+  );
+  const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id);
 
   const updateCardPosition = useMutation(({ storage }, id, x, y) => {
     const card = storage.get("cards").find((card) => card.get("id") === id);
@@ -57,6 +68,34 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     const index = cards.findIndex((card) => card.get("id") === id);
     if (index !== -1) {
       cards.delete(index);
+    }
+  }, []);
+
+  const bringCardToFront = useMutation(({ storage }, cardId: string) => {
+    const zIndexOrderListWithCardIds = storage.get(
+      "zIndexOrderListWithCardIds"
+    );
+    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
+
+    if (index !== -1) {
+      zIndexOrderListWithCardIds.delete(index);
+      zIndexOrderListWithCardIds.push(cardId);
+    }
+  }, []);
+
+  const bringCardToBack = useMutation(({ storage }, cardId: string) => {
+    const zIndexOrderListWithCardIds = storage
+      .get("zIndexOrderListWithCardIds")
+      .toArray();
+    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
+
+    if (index !== -1) {
+      zIndexOrderListWithCardIds.splice(index, 1);
+      zIndexOrderListWithCardIds.unshift(cardId);
+      storage.set(
+        "zIndexOrderListWithCardIds",
+        new LiveList(zIndexOrderListWithCardIds)
+      );
     }
   }, []);
 
@@ -241,6 +280,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         left: card.positionX,
         width: CARD_DIMENSIONS.width,
         height: CARD_DIMENSIONS.height,
+        zIndex: cardZIndex,
         ...(personFocusingOnThisCard
           ? {
               border: `2px solid ${getColorWithId(
@@ -296,6 +336,18 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           onClick={() => onDelete(card.id)}
         >
           <Trash />
+        </Toolbar.Button>
+        <Toolbar.Button
+          aria-label={`bring ${formatOrdinals(index + 1)} card to back`}
+          onClick={() => bringCardToBack(card.id)}
+        >
+          Bring to back
+        </Toolbar.Button>
+        <Toolbar.Button
+          aria-label={`bring ${formatOrdinals(index + 1)} card to front`}
+          onClick={() => bringCardToFront(card.id)}
+        >
+          Bring to front
         </Toolbar.Button>
       </Toolbar.Root>
     </div>

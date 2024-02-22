@@ -16,6 +16,7 @@ type Presence = {
 
 export type Storage = {
   cards: LiveList<LiveObject<CardType>>;
+  zIndexOrderListWithCardIds: LiveList<string>;
   boardName: string;
 };
 
