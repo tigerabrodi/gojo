@@ -1,4 +1,4 @@
-import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
+import type { FocusEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   useMutation,
@@ -41,6 +41,10 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
   // Needed to change the cursor to text when the card content is focused
   const [isCardContentFocused, setIsCardContentFocused] = useState(false);
+
+  // Needed to prevent focusing card content when card clicked first time
+  const [hasCardBeenClickedBefore, setHasCardBeenClickedBefore] =
+    useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
@@ -138,24 +142,10 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     []
   );
 
-  function onDoubleClick(event: MouseEvent<HTMLDivElement>) {
-    if (cardContentRef.current) {
-      cardContentRef.current.focus();
-
-      // Needed because we're working with `contentEditable` element
-      moveCursorToEnd(cardContentRef.current);
-
-      setIsCardContentFocused(true);
-    }
-
-    // Needed to prevent card from being created when double clicking
-    event.stopPropagation();
-  }
-
   function handleInput(event: FormEvent<HTMLSpanElement>) {
     const newHtml = event.currentTarget.innerHTML || "";
     const purifiedHtml = DOMPurify.sanitize(newHtml);
-    setContent(purifiedHtml); // Update the content state
+    setContent(purifiedHtml);
     updateCardContent(card.id, purifiedHtml);
   }
 
@@ -169,10 +159,13 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [content]);
 
-  function onCardBlur() {
+  function onCardBlur(event: FocusEvent<HTMLDivElement>) {
+    if (event.relatedTarget === cardContentRef.current) return;
+
     cardContentRef.current?.blur();
     setIsCardContentFocused(false);
-    leaveSelectedCardId();
+    setHasCardBeenClickedBefore(false);
+    updateMyPresence({ isTyping: false, selectedCardId: null });
   }
 
   function handleCardMove(direction: "up" | "down" | "left" | "right") {
@@ -248,15 +241,29 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [isSomeoneElseTypingOnThisCard]);
 
-  function setSelectedCardId() {
-    updateMyPresence({
-      selectedCardId: card.id,
-    });
+  function onCardClick(event: MouseEvent<HTMLDivElement>) {
+    const isCardContentCurrentlyFocused =
+      document.activeElement === cardContentRef.current;
+
+    if (isCardContentCurrentlyFocused) return;
+
+    if (!hasCardBeenClickedBefore) {
+      setHasCardBeenClickedBefore(true);
+      return;
+    }
+
+    if (cardContentRef.current) {
+      cardContentRef.current.focus();
+      moveCursorToEnd(cardContentRef.current);
+      setIsCardContentFocused(true);
+      scrollToTheBottomOfCardContent();
+      updateMyPresence({ isTyping: true });
+    }
   }
 
-  function leaveSelectedCardId() {
+  function onCardFocus() {
     updateMyPresence({
-      selectedCardId: null,
+      selectedCardId: card.id,
     });
   }
 
@@ -267,14 +274,18 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       className="card"
       id={card.id}
       aria-label={`${formatOrdinals(index + 1)} card`}
-      onDoubleClick={onDoubleClick}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onBlur={onCardBlur}
+      onFocus={onCardFocus}
       onKeyDown={onCardKeyDown}
-      onFocus={setSelectedCardId}
+      onClick={onCardClick}
+      onDoubleClick={(event) => {
+        // Needed to prevent card from being created when double clicking
+        event.stopPropagation();
+      }}
       style={{
         top: card.positionY,
         left: card.positionX,
@@ -304,24 +315,13 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       )}
 
       <div
-        contentEditable={!isSomeoneElseTypingOnThisCard}
+        contentEditable
         suppressContentEditableWarning
         role="textbox"
         aria-label={`content of ${formatOrdinals(index + 1)} card`}
         ref={cardContentRef}
         onInput={handleInput}
         className="card-content"
-        onBlur={() => {
-          updateMyPresence({
-            isTyping: false,
-          });
-        }}
-        onFocus={() => {
-          scrollToTheBottomOfCardContent();
-          updateMyPresence({
-            isTyping: true,
-          });
-        }}
         style={{
           cursor: isCardContentFocused ? "text" : "default",
         }}
