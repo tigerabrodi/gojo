@@ -1,8 +1,8 @@
 # Gojo
 
 A web app where you can collaborate and brainstorm ideas.
-
-https://github.com/narutosstudent/gojo/assets/49603590/6a4644de-1490-4bef-8168-862cc6b9266a
+        
+https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e3651c46ef41
 
 # Features
 
