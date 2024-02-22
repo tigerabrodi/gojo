@@ -199,6 +199,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       return;
     }
 
+    // If user editing text, moving card with arrow keys should not be triggered
+    if (cardContentRef.current === document.activeElement) return;
+
     const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
 
     if (arrowKey) {
