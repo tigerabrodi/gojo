@@ -379,6 +379,7 @@ If someone else is focusing on a card, we update the styling and also display th
 - Send an "invite" rather than direct addition.
 - Ability to resize cards.
 - Ability to change font size, an option to have auto font size similar to Miro cards would be cool too.
+- Make it accessible 😬
 
 # Liveblocks
 
