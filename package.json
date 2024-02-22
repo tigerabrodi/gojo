@@ -21,7 +21,7 @@
     "@liveblocks/client": "^1.9.7",
     "@liveblocks/node": "^1.9.7",
     "@liveblocks/react": "^1.9.7",
-    "@prisma/client": "^5.9.1",
+    "@prisma/client": "^5.10.2",
     "@radix-ui/react-toolbar": "^1.0.4",
     "@remix-run/css-bundle": "^2.0.0",
     "@remix-run/node": "^2.0.0",
@@ -51,7 +51,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.8",
     "eslint": "^8.38.0",
-    "prisma": "^5.9.1",
+    "prisma": "^5.10.2",
     "typescript": "^5.1.6"
   },
   "engines": {
