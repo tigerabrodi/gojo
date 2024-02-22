@@ -245,7 +245,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [isSomeoneElseTypingOnThisCard]);
 
-  function onCardClick(event: MouseEvent<HTMLDivElement>) {
+  function onCardClick() {
     const isCardContentCurrentlyFocused =
       document.activeElement === cardContentRef.current;
 

@@ -230,7 +230,7 @@ test("Board collaboration complete simple flow", async ({ browser }) => {
   await user2Context.close();
 });
 
-test.afterEach(async ({ browser }) => {
+test.afterEach(async () => {
   // All boards created by test users
   const boardsToDelete = await prisma.board.findMany({
     where: {
