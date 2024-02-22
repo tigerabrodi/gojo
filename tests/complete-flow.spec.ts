@@ -44,9 +44,12 @@ test("Board collaboration complete simple flow", async ({ browser }) => {
 
   // User 1 creates a board
   await user1Page.getByRole("button", { name: "Create board" }).click();
+
   await user1Page
-    .getByRole("heading", { name: "Board name: Untitled board" })
-    .isHidden();
+    .getByRole("heading", {
+      name: "Board name: Untitled board",
+    })
+    .waitFor();
 
   // User 1 creates card
   await user1Page.dblclick("main");
