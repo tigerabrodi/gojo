@@ -1,11 +1,6 @@
 import type { FocusEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import {
-  useMutation,
-  useMyPresence,
-  useOthers,
-  useStorage,
-} from "~/liveblocks.config";
+import { useMyPresence, useOthers, useStorage } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
 import type { LinksFunction } from "@vercel/remix";
@@ -14,7 +9,7 @@ import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash } from "~/icons";
 import { formatOrdinals, getColorWithId } from "~/helpers/functions";
 import DOMPurify from "dompurify";
-import { LiveList } from "@liveblocks/client";
+import { useGetCardLiveblocksQueries } from "./liveblocks-queries";
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -59,49 +54,13 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   );
   const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id);
 
-  const updateCardPosition = useMutation(({ storage }, id, x, y) => {
-    const card = storage.get("cards").find((card) => card.get("id") === id);
-    if (card) {
-      card.set("positionX", x);
-      card.set("positionY", y);
-    }
-  }, []);
-
-  const onDelete = useMutation(({ storage }, id: string) => {
-    const cards = storage.get("cards");
-    const index = cards.findIndex((card) => card.get("id") === id);
-    if (index !== -1) {
-      cards.delete(index);
-    }
-  }, []);
-
-  const bringCardToFront = useMutation(({ storage }, cardId: string) => {
-    const zIndexOrderListWithCardIds = storage.get(
-      "zIndexOrderListWithCardIds"
-    );
-    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
-
-    if (index !== -1) {
-      zIndexOrderListWithCardIds.delete(index);
-      zIndexOrderListWithCardIds.push(cardId);
-    }
-  }, []);
-
-  const bringCardToBack = useMutation(({ storage }, cardId: string) => {
-    const zIndexOrderListWithCardIds = storage
-      .get("zIndexOrderListWithCardIds")
-      .toArray();
-    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
-
-    if (index !== -1) {
-      zIndexOrderListWithCardIds.splice(index, 1);
-      zIndexOrderListWithCardIds.unshift(cardId);
-      storage.set(
-        "zIndexOrderListWithCardIds",
-        new LiveList(zIndexOrderListWithCardIds)
-      );
-    }
-  }, []);
+  const {
+    bringCardToBack,
+    bringCardToFront,
+    onDelete,
+    updateCardPosition,
+    updateCardContent,
+  } = useGetCardLiveblocksQueries();
 
   function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
     // If the card content is focused, we don't want to start dragging the card
@@ -131,16 +90,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   function handleMouseUp() {
     setIsDragging(false);
   }
-
-  const updateCardContent = useMutation(
-    ({ storage }, id: string, newHtml: string) => {
-      const card = storage.get("cards").find((card) => card.get("id") === id);
-      if (card) {
-        card.set("html", newHtml);
-      }
-    },
-    []
-  );
 
   function handleInput(event: FormEvent<HTMLSpanElement>) {
     const newHtml = event.currentTarget.innerHTML || "";
