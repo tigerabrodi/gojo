@@ -22,7 +22,7 @@ https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e
 
 `COOKIE_SECRET` -> can be whatever you want, I'd recommend generating a random string.
 `LIVEBLOCKS_SECRET_KEY` -> setup account on Liveblocks and copy the secret private key from development environment.
-`DATABASE_URL` -> URL from a Postgres DB, I setup mine on [Railway](https://railway.app/), it's super easy.
+`DATABASE_URL` -> URL of a Postgres DB, I setup mine on [Railway](https://railway.app/), it's super easy.
 
 # Features explained
 
@@ -372,6 +372,79 @@ If someone else is focusing on a card, we update the styling and also display th
 
 </details>
 
+<details>
+  <summary>🍿 Moving card with arrow keys</summary>
+
+---
+
+When a card is focused, you can move it with arrow keys.
+
+However, we don't want this to happen if you're editing the text. That would otherwise be a very confusing experience.
+
+Code for moving the card with arrow keys:
+
+```ts
+  function handleCardMove(direction: "up" | "down" | "left" | "right") {
+    let newX = card.positionX;
+    let newY = card.positionY;
+
+    switch (direction) {
+      case "up":
+        newY -= 10;
+        break;
+      case "down":
+        newY += 10;
+        break;
+      case "left":
+        newX -= 10;
+        break;
+      case "right":
+        newX += 10;
+        break;
+      default:
+        break;
+    }
+
+    updateCardPosition(card.id, newX, newY);
+  }
+
+  function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Escape" && cardContentRef.current) {
+      cardContentRef.current.blur();
+      return;
+    }
+
+    // If user editing text, moving card with arrow keys should not be triggered
+    if (cardContentRef.current === document.activeElement) return;
+
+    const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
+
+    if (arrowKey) {
+      switch (event.key) {
+        case "ArrowUp":
+          handleCardMove("up");
+          break;
+        case "ArrowDown":
+          handleCardMove("down");
+          break;
+        case "ArrowLeft":
+          handleCardMove("left");
+          break;
+        case "ArrowRight":
+          handleCardMove("right");
+          break;
+        default:
+          break;
+      }
+
+      // Prevent the page from scrolling when using arrow keys
+      event.preventDefault();
+    }
+  }
+```
+
+</details>
+
 # Future Improvements Ideas
 
 - Nicer input in share dialog, similar to Google Docs: Auto complete + ability to add multiple users at once before sending out invite.
@@ -379,7 +452,7 @@ If someone else is focusing on a card, we update the styling and also display th
 - Send an "invite" rather than direct addition.
 - Ability to resize cards.
 - Ability to change font size, an option to have auto font size similar to Miro cards would be cool too.
-- Make it accessible 😬
+- Make it more accessible. It will never work without JavaScript because of the real-time experience, but making the drag experience accessible would be good.
 
 # Liveblocks
 
