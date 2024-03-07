@@ -35,7 +35,7 @@ At the moment, you can only add someone as editor. Supporting other roles should
 
 To make this work, we keep track of the roles for every board.
 
-```ts
+```tsx
 model BoardRole {
   id       String   @id @default(uuid())
   role     String // owner, editor
@@ -64,7 +64,7 @@ We get the zIndex for every card by simply calling `indexOf` using the card's id
 
 Liveblocks storage type code:
 
-```ts
+```tsx
 type Storage = {
   cards: LiveList<LiveObject<CardType>>;
   zIndexOrderListWithCardIds: LiveList<string>;
@@ -74,7 +74,7 @@ type Storage = {
 
 Code inside Card component for bringing cards back or front:
 
-```ts
+```tsx
 const bringCardToFront = useMutation(({ storage }, cardId: string) => {
   const zIndexOrderListWithCardIds = storage.get("zIndexOrderListWithCardIds");
   const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
@@ -125,7 +125,7 @@ For every board, we create a secretId. The link appends this secretId as query p
 
 Board model code:
 
-```ts
+```tsx
 model Board {
   id       String      @id @default(uuid())
   name     String
@@ -139,7 +139,7 @@ model Board {
 
 Board route loader function, this runs on the server before client renders anything:
 
-```ts
+```tsx
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const userId = await requireAuthCookie(request);
   const boardId = params.id;
@@ -181,7 +181,7 @@ This seems hard, and honestly, it is, but Liveblocks makes things simple to impl
 
 Code for mapping out the cursor component:
 
-```ts
+```tsx
 {
   others.map(({ connectionId, presence }) => {
     if (presence.cursor === null) {
@@ -203,7 +203,7 @@ Code for mapping out the cursor component:
 
 We make sure to update the user's own presence when they're moving around the page:
 
-```ts
+```tsx
       <main
         onDoubleClick={createNewCard}
         onPointerMove={(event) => {
@@ -225,7 +225,7 @@ We make sure to update the user's own presence when they're moving around the pa
 
 Get color with id function:
 
-```ts
+```tsx
 export function getColorWithId(id: number) {
   return COLORS[id % COLORS.length];
 }
@@ -235,7 +235,7 @@ At scale where we expect many users on a single board, we'd need to make sure to
 
 Cursor component:
 
-```ts
+```tsx
 import type { LinksFunction } from "@vercel/remix";
 import cursorStyles from "./Cursor.css";
 
@@ -290,7 +290,7 @@ We also have to keep track of whether the card was clicked already or not, if it
 
 Code when clicking on the card:
 
-```ts
+```tsx
 function onCardClick() {
   const isCardContentCurrentlyFocused =
     document.activeElement === cardContentRef.current;
@@ -318,7 +318,7 @@ When we focus we need to right away update the presence for other users, telling
 
 Code for focusing on card:
 
-```ts
+```tsx
 function onCardFocus() {
   updateMyPresence({
     selectedCardId: card.id,
@@ -332,11 +332,11 @@ Like I said before, blur happens when the focus leaves the element, even if the 
 
 This is where I learned about `relatedTarget`, taken from [MDN](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/relatedTarget): "The MouseEvent.relatedTarget read-only property is the secondary target for the mouse event, if there is one."
 
-This is similar to mouseleave, `relatedTarget` points to the element it enters.
+This is similar to mouseleave event (referring to the MDN document), `relatedTarget` points to the element it enters.
 
 Code for card blur:
 
-```ts
+```tsx
 function onCardBlur(event: FocusEvent<HTMLDivElement>) {
   // If we're focusing on card content, card's blur should not be triggered
   if (event.relatedTarget === cardContentRef.current) return;
@@ -363,7 +363,7 @@ What's the UI for showing who is editing what card?
 
 If someone else is focusing on a card, we update the styling and also display the name tag for the card:
 
-```ts
+```tsx
 {
   personFocusingOnThisCard && (
     <div
@@ -391,7 +391,7 @@ However, we don't want this to happen if you're editing the text. That would oth
 
 Code for moving the card with arrow keys:
 
-```ts
+```tsx
 function handleCardMove(direction: "up" | "down" | "left" | "right") {
   let newX = card.positionX;
   let newY = card.positionY;
