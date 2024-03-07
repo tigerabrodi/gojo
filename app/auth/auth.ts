@@ -10,7 +10,7 @@ if (secret === "default") {
   secret = "default-secret";
 }
 
-let authCookie = createCookie("auth", {
+const authCookie = createCookie("auth", {
   secrets: [secret],
   // 30 days
   maxAge: 30 * 24 * 60 * 60,
