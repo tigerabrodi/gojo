@@ -15,7 +15,7 @@ model User {
   email       String        @unique
   name        String
   Password    Password?
-  boardRoles  BoardRole[]   // Relation to track user roles on boards
+  boardRoles  BoardRole[] 
 }
 
 model Password {
@@ -30,7 +30,7 @@ model Board {
   id       String      @id @default(uuid())
   name     String
   secretId String      @default(uuid())
-  roles    BoardRole[] // Relation to track user roles on this board
+  roles    BoardRole[]
   lastOpenedAt DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
