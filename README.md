@@ -31,7 +31,7 @@ https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e
 
 ---
 
-At the moment, you can only add someone as editor. Supporting other roles shouldn't be too hard, but I left it our for now.
+At the moment, you can only add someone as editor. Supporting other roles shouldn't be too hard, but I left it out for now.
 
 To make this work, we keep track of the roles for every board.
 
@@ -75,33 +75,31 @@ type Storage = {
 Code inside Card component for bringing cards back or front:
 
 ```ts
-  const bringCardToFront = useMutation(({ storage }, cardId: string) => {
-    const zIndexOrderListWithCardIds = storage.get(
-      "zIndexOrderListWithCardIds"
+const bringCardToFront = useMutation(({ storage }, cardId: string) => {
+  const zIndexOrderListWithCardIds = storage.get("zIndexOrderListWithCardIds");
+  const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
+
+  if (index !== -1) {
+    zIndexOrderListWithCardIds.delete(index);
+    zIndexOrderListWithCardIds.push(cardId);
+  }
+}, []);
+
+const bringCardToBack = useMutation(({ storage }, cardId: string) => {
+  const zIndexOrderListWithCardIds = storage
+    .get("zIndexOrderListWithCardIds")
+    .toArray();
+  const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
+
+  if (index !== -1) {
+    zIndexOrderListWithCardIds.splice(index, 1);
+    zIndexOrderListWithCardIds.unshift(cardId);
+    storage.set(
+      "zIndexOrderListWithCardIds",
+      new LiveList(zIndexOrderListWithCardIds)
     );
-    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
-
-    if (index !== -1) {
-      zIndexOrderListWithCardIds.delete(index);
-      zIndexOrderListWithCardIds.push(cardId);
-    }
-  }, []);
-
-  const bringCardToBack = useMutation(({ storage }, cardId: string) => {
-    const zIndexOrderListWithCardIds = storage
-      .get("zIndexOrderListWithCardIds")
-      .toArray();
-    const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
-
-    if (index !== -1) {
-      zIndexOrderListWithCardIds.splice(index, 1);
-      zIndexOrderListWithCardIds.unshift(cardId);
-      storage.set(
-        "zIndexOrderListWithCardIds",
-        new LiveList(zIndexOrderListWithCardIds)
-      );
-    }
-  }, []);
+  }
+}, []);
 ```
 
 </details>
@@ -178,21 +176,23 @@ This seems hard, and honestly, it is, but Liveblocks makes things simple to impl
 Code for mapping out the cursor component:
 
 ```ts
-        {others.map(({ connectionId, presence }) => {
-          if (presence.cursor === null) {
-            return null;
-          }
+{
+  others.map(({ connectionId, presence }) => {
+    if (presence.cursor === null) {
+      return null;
+    }
 
-          return (
-            <Cursor
-              key={`cursor-${connectionId}`}
-              color={getColorWithId(connectionId)}
-              x={presence.cursor.x}
-              y={presence.cursor.y}
-              name={presence.name}
-            />
-          );
-        })}
+    return (
+      <Cursor
+        key={`cursor-${connectionId}`}
+        color={getColorWithId(connectionId)}
+        x={presence.cursor.x}
+        y={presence.cursor.y}
+        name={presence.name}
+      />
+    );
+  });
+}
 ```
 
 We make sure to update the user's own presence when they're moving around the page:
@@ -283,25 +283,25 @@ We also have to keep track of whether the card was clicked already or not, if it
 Code when clicking on the card:
 
 ```ts
-  function onCardClick() {
-    const isCardContentCurrentlyFocused =
-      document.activeElement === cardContentRef.current;
+function onCardClick() {
+  const isCardContentCurrentlyFocused =
+    document.activeElement === cardContentRef.current;
 
-    if (isCardContentCurrentlyFocused) return;
+  if (isCardContentCurrentlyFocused) return;
 
-    if (!hasCardBeenClickedBefore) {
-      setHasCardBeenClickedBefore(true);
-      return;
-    }
-
-    if (cardContentRef.current) {
-      cardContentRef.current.focus();
-      moveCursorToEnd(cardContentRef.current);
-      setIsCardContentFocused(true);
-      scrollToTheBottomOfCardContent();
-      updateMyPresence({ isTyping: true });
-    }
+  if (!hasCardBeenClickedBefore) {
+    setHasCardBeenClickedBefore(true);
+    return;
   }
+
+  if (cardContentRef.current) {
+    cardContentRef.current.focus();
+    moveCursorToEnd(cardContentRef.current);
+    setIsCardContentFocused(true);
+    scrollToTheBottomOfCardContent();
+    updateMyPresence({ isTyping: true });
+  }
+}
 ```
 
 Now, this is where it gets funky.
@@ -311,11 +311,11 @@ When we focus we need to right away update the presence for other users, telling
 Code for focusing on card:
 
 ```ts
-  function onCardFocus() {
-    updateMyPresence({
-      selectedCardId: card.id,
-    });
-  }
+function onCardFocus() {
+  updateMyPresence({
+    selectedCardId: card.id,
+  });
+}
 ```
 
 When blurring the card, things also get interesting. There are several things we wanna do, and we ONLY want the blur logic to proceed if we're not about to edit the content.
@@ -329,15 +329,15 @@ This is similar to mouseleave, `relatedTarget` points to the element it enters.
 Code for card blur:
 
 ```ts
-  function onCardBlur(event: FocusEvent<HTMLDivElement>) {
-    // If we're focusing on card content, card's blur should not be triggered
-    if (event.relatedTarget === cardContentRef.current) return;
+function onCardBlur(event: FocusEvent<HTMLDivElement>) {
+  // If we're focusing on card content, card's blur should not be triggered
+  if (event.relatedTarget === cardContentRef.current) return;
 
-    cardContentRef.current?.blur();
-    setIsCardContentFocused(false);
-    setHasCardBeenClickedBefore(false);
-    updateMyPresence({ isTyping: false, selectedCardId: null });
-  }
+  cardContentRef.current?.blur();
+  setIsCardContentFocused(false);
+  setHasCardBeenClickedBefore(false);
+  updateMyPresence({ isTyping: false, selectedCardId: null });
+}
 ```
 
 How do we know someone is selecting what card?
@@ -345,10 +345,10 @@ How do we know someone is selecting what card?
 We get that from the `useOthers` hook.
 
 ```js
-  const others = useOthers();
-  const personFocusingOnThisCard = others.find(
-    (person) => person.presence.selectedCardId === card.id
-  );
+const others = useOthers();
+const personFocusingOnThisCard = others.find(
+  (person) => person.presence.selectedCardId === card.id
+);
 ```
 
 What's the UI for showing who is editing what card?
@@ -356,18 +356,18 @@ What's the UI for showing who is editing what card?
 If someone else is focusing on a card, we update the styling and also display the name tag for the card:
 
 ```ts
-      {personFocusingOnThisCard && (
-        <div
-          className="card-presence-name"
-          style={{
-            backgroundColor: getColorWithId(
-              personFocusingOnThisCard.connectionId
-            ),
-          }}
-        >
-          {personFocusingOnThisCard.presence.name}
-        </div>
-      )}
+{
+  personFocusingOnThisCard && (
+    <div
+      className="card-presence-name"
+      style={{
+        backgroundColor: getColorWithId(personFocusingOnThisCard.connectionId),
+      }}
+    >
+      {personFocusingOnThisCard.presence.name}
+    </div>
+  );
+}
 ```
 
 </details>
@@ -384,63 +384,63 @@ However, we don't want this to happen if you're editing the text. That would oth
 Code for moving the card with arrow keys:
 
 ```ts
-  function handleCardMove(direction: "up" | "down" | "left" | "right") {
-    let newX = card.positionX;
-    let newY = card.positionY;
+function handleCardMove(direction: "up" | "down" | "left" | "right") {
+  let newX = card.positionX;
+  let newY = card.positionY;
 
-    switch (direction) {
-      case "up":
-        newY -= 10;
+  switch (direction) {
+    case "up":
+      newY -= 10;
+      break;
+    case "down":
+      newY += 10;
+      break;
+    case "left":
+      newX -= 10;
+      break;
+    case "right":
+      newX += 10;
+      break;
+    default:
+      break;
+  }
+
+  updateCardPosition(card.id, newX, newY);
+}
+
+function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  if (event.key === "Escape" && cardContentRef.current) {
+    cardContentRef.current.blur();
+    return;
+  }
+
+  // If user editing text, moving card with arrow keys should not be triggered
+  if (cardContentRef.current === document.activeElement) return;
+
+  const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
+
+  if (arrowKey) {
+    switch (event.key) {
+      case "ArrowUp":
+        handleCardMove("up");
         break;
-      case "down":
-        newY += 10;
+      case "ArrowDown":
+        handleCardMove("down");
         break;
-      case "left":
-        newX -= 10;
+      case "ArrowLeft":
+        handleCardMove("left");
         break;
-      case "right":
-        newX += 10;
+      case "ArrowRight":
+        handleCardMove("right");
         break;
       default:
         break;
     }
 
-    updateCardPosition(card.id, newX, newY);
+    // Prevent the page from scrolling when using arrow keys
+    event.preventDefault();
   }
-
-  function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape" && cardContentRef.current) {
-      cardContentRef.current.blur();
-      return;
-    }
-
-    // If user editing text, moving card with arrow keys should not be triggered
-    if (cardContentRef.current === document.activeElement) return;
-
-    const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
-
-    if (arrowKey) {
-      switch (event.key) {
-        case "ArrowUp":
-          handleCardMove("up");
-          break;
-        case "ArrowDown":
-          handleCardMove("down");
-          break;
-        case "ArrowLeft":
-          handleCardMove("left");
-          break;
-        case "ArrowRight":
-          handleCardMove("right");
-          break;
-        default:
-          break;
-      }
-
-      // Prevent the page from scrolling when using arrow keys
-      event.preventDefault();
-    }
-  }
+}
 ```
 
 </details>
