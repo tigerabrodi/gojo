@@ -231,6 +231,8 @@ export function getColorWithId(id: number) {
 }
 ```
 
+At scale where we expect many users on a single board, we'd need to make sure to have many more colors. Currently, COLORS contains 15 colors.
+
 Cursor component:
 
 ```ts
