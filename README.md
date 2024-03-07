@@ -102,6 +102,12 @@ const bringCardToBack = useMutation(({ storage }, cardId: string) => {
 }, []);
 ```
 
+## Side note
+
+This is a simple way of managing zIndex. It's not the most efficient way, because e.g. adding something to beginning of the array is O(n) time complexity. Arrays are stored as a continuous block of memory, so adding something to the beginning means we have to shift everything else to the right, if there is no space available, we'd have to allocate a new block of memory and copy everything over.
+
+If you were building something like Figma from scratch (no liveblocks) where milliseconds matter, you would probably want to consider a different approach.
+
 </details>
 
 <details>
