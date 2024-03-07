@@ -37,6 +37,7 @@ export default function Boards() {
             <li key={board.id}>
               <Link
                 to={`/boards/${board.id}`}
+                prefetch="render"
                 aria-label={board.name || "Untitled board"}
               >
                 <span className="name">{board.name || "Untitled"}</span>

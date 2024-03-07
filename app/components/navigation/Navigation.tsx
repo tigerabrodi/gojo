@@ -15,7 +15,7 @@ export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <nav>
       <div className="logo">
-        <Link to="/" aria-label="home" className="logo">
+        <Link to="/" aria-label="home" className="logo" prefetch="render">
           <Kakashi />
           <span>Gojo</span>
         </Link>
