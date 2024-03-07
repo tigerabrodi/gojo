@@ -83,7 +83,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
     if (!isUserAllowedToEnterBoard) {
       throw redirectWithError("/boards", {
-        message: "You are not allowed on this board at all.",
+        message: "You are not allowed on this board.",
       });
     }
 
@@ -102,7 +102,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!boardRole) {
     throw redirectWithError("/boards", {
-      message: "You are not allowed on this board at all.",
+      message: "You are not allowed on this board.",
     });
   }
 

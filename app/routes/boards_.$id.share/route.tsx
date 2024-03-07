@@ -43,8 +43,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   if (!isUserAllowedToEditBoard) {
     throw redirectWithError("/boards", {
-      message:
-        "Something went wrong. You are not allowed on this board at all.",
+      message: "Something went wrong. You are not allowed on this board.",
     });
   }
 
