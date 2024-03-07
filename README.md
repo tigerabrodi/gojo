@@ -453,6 +453,10 @@ function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
 
 </details>
 
+# Bugs
+
+- Moving a card very fast stops the dragging. Probably because the cursor leaves the card's area.
+
 # Future Improvements Ideas
 
 - Nicer input in share dialog, similar to Google Docs: Auto complete + ability to add multiple users at once before sending out invite.
