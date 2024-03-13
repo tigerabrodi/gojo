@@ -1,5 +1,5 @@
 import type { FocusEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMyPresence, useOthers, useStorage } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
