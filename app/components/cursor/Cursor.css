@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   column-gap: 10px;
-  z-index: 1000;
+  z-index: 9;
 
   svg {
     width: 20px;
