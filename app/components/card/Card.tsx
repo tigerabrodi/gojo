@@ -1,5 +1,5 @@
 import type { FocusEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMyPresence, useOthers, useStorage } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
 import styles from "./Card.css";
@@ -54,13 +54,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   );
   const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id);
 
-  const {
-    bringCardToBack,
-    bringCardToFront,
-    onDelete,
-    updateCardPosition,
-    updateCardContent,
-  } = useGetCardLiveblocksQueries();
+  const { bringCardToFront, onDelete, updateCardPosition, updateCardContent } =
+    useGetCardLiveblocksQueries();
 
   function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
     // If the card content is focused, we don't want to start dragging the card
@@ -215,6 +210,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }
 
   function onCardFocus() {
+    bringCardToFront(card.id);
+
     updateMyPresence({
       selectedCardId: card.id,
     });
@@ -289,18 +286,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           onClick={() => onDelete(card.id)}
         >
           <Trash />
-        </Toolbar.Button>
-        <Toolbar.Button
-          aria-label={`bring ${formatOrdinals(index + 1)} card to back`}
-          onClick={() => bringCardToBack(card.id)}
-        >
-          Bring to back
-        </Toolbar.Button>
-        <Toolbar.Button
-          aria-label={`bring ${formatOrdinals(index + 1)} card to front`}
-          onClick={() => bringCardToFront(card.id)}
-        >
-          Bring to front
         </Toolbar.Button>
       </Toolbar.Root>
     </div>
