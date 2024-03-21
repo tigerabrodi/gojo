@@ -6,8 +6,8 @@ Some notes:
 
 - Double click on board to create a card.
 - Click once to "focus" on card. Click again to begin entering text.
-- Bring to front and back button to manage zIndex for the cards.
-- When sharing, you can also copy link similar to Google Docs. Anyone with link gets instant access.
+- Focusing on a card brings it to the front.
+- When sharing, you can also copy link similar to Google Docs. Anyone with the link gets instant access.
 
 https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e3651c46ef41
 
@@ -56,7 +56,7 @@ model BoardRole {
 
 ---
 
-We have a bring to back and bring to front button for every single card.
+When focusing on a card, we bring it to the front. The order of zIndex is kept via `zIndexOrderListWithCardIds` in the liveblocks storage.
 
 In the liveblocks storage, we have an array of the cardIds `zIndexOrderListWithCardIds`. The last card has the highest zIndex in this list.
 
@@ -72,7 +72,7 @@ type Storage = {
 };
 ```
 
-Code inside Card component for bringing cards back or front:
+Code inside Card component for bringing cards to the front:
 
 ```tsx
 const bringCardToFront = useMutation(({ storage }, cardId: string) => {
@@ -82,22 +82,6 @@ const bringCardToFront = useMutation(({ storage }, cardId: string) => {
   if (index !== -1) {
     zIndexOrderListWithCardIds.delete(index);
     zIndexOrderListWithCardIds.push(cardId);
-  }
-}, []);
-
-const bringCardToBack = useMutation(({ storage }, cardId: string) => {
-  const zIndexOrderListWithCardIds = storage
-    .get("zIndexOrderListWithCardIds")
-    .toArray();
-  const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
-
-  if (index !== -1) {
-    zIndexOrderListWithCardIds.splice(index, 1);
-    zIndexOrderListWithCardIds.unshift(cardId);
-    storage.set(
-      "zIndexOrderListWithCardIds",
-      new LiveList(zIndexOrderListWithCardIds)
-    );
   }
 }, []);
 ```
