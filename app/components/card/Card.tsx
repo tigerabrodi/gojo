@@ -227,7 +227,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
       onBlur={onCardBlur}
       onFocus={onCardFocus}
       onKeyDown={onCardKeyDown}
