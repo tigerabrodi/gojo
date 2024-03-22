@@ -28,7 +28,12 @@ export const cardLinks: LinksFunction = () => [
 
 export function Card({ card, index }: { card: CardType; index: number }) {
   const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+
+  // Needed to calculate the distance between the cursor and the card's top-left corner
+  // Otherwise, the card would jump to the cursor's position when dragging
+  // This would be a bad user experience
+  // Hence needed to maintain relative position between the cursor and the card
+  const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
 
   // Needed to properly move cursor to the end of the contentEditable span
   const [content, setContent] = useState(card.html);
@@ -61,8 +66,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     if (isDragging) {
       function handleGlobalMouseMove(event: MouseEvent) {
         if (!isDragging) return;
-        const newX = event.clientX - startPosition.x;
-        const newY = event.clientY - startPosition.y;
+        const newX = event.clientX - dragStartOffset.x;
+        const newY = event.clientY - dragStartOffset.y;
         updateCardPosition(card.id, newX, newY);
       }
 
@@ -83,13 +88,15 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }, [
     card.id,
     isDragging,
-    startPosition.x,
-    startPosition.y,
+    dragStartOffset.x,
+    dragStartOffset.y,
     updateCardPosition,
   ]);
 
   function handleMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
-    if (document.activeElement === cardContentRef.current) {
+    const isUserEditingCardContent =
+      document.activeElement === cardContentRef.current;
+    if (isUserEditingCardContent) {
       return;
     }
 
@@ -98,7 +105,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
     setIsDragging(true);
 
-    setStartPosition({
+    setDragStartOffset({
       x: startX - card.positionX,
       y: startY - card.positionY,
     });
