@@ -1,12 +1,14 @@
+import type { LoaderFunctionArgs, LinksFunction } from '@vercel/remix'
+
 import { Form, Link, useLoaderData, useNavigation } from '@remix-run/react'
+import { redirect, json } from '@vercel/remix'
+
+import { createBoard, getBoardsForUser } from './queries'
+import styles from './styles.css'
+
+import { requireAuthCookie } from '~/auth'
 import { FORM_INTENTS, INTENT } from '~/helpers'
 import { Plus } from '~/icons'
-
-import styles from './styles.css'
-import { redirect, json } from '@vercel/remix'
-import type { LoaderFunctionArgs, LinksFunction } from '@vercel/remix'
-import { requireAuthCookie } from '~/auth'
-import { createBoard, getBoardsForUser } from './queries'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 

@@ -10,7 +10,9 @@
     "dev": "remix dev --manual",
     "start": "remix-serve ./build/index.js",
     "typecheck": "tsc",
-    "test": "playwright test --ui"
+    "test": "playwright test --ui",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint-fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
     "@conform-to/react": "^1.0.0",
@@ -51,7 +53,10 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.8",
-    "eslint": "^8.38.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.0",
+    "eslint-config-remix": "^0.0.2",
+    "eslint-plugin-import": "^2.29.1",
     "prettier": "^3.2.5",
     "prisma": "^5.10.2",
     "typescript": "^5.1.6"

@@ -1,6 +1,7 @@
-import { expect, test } from '@playwright/test'
 import fs from 'fs'
-import { prisma } from '~/db'
+
+import { expect, test } from '@playwright/test'
+
 import {
   createRandomBoard,
   user1Details,
@@ -8,6 +9,8 @@ import {
   user2Details,
   user2File,
 } from './utils'
+
+import { prisma } from '~/db'
 import { liveblocks } from '~/helpers'
 
 type User = {
@@ -241,10 +244,14 @@ test.afterEach(async () => {
     },
   })
 
+  const deleteRoomPromises = []
+
   // First delete from liveblocks
   for (const board of boardsToDelete) {
-    await liveblocks.deleteRoom(board.id)
+    deleteRoomPromises.push(liveblocks.deleteRoom(board.id))
   }
+
+  await Promise.all(deleteRoomPromises)
 
   // Now delete from database
   await prisma.board.deleteMany({

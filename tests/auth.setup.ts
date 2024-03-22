@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 import { test as setup } from '@playwright/test'
 
 import {
@@ -8,7 +10,6 @@ import {
   user2Details,
   user2File,
 } from './utils'
-import fs from 'fs'
 
 setup('authenticate users', async ({ browser }) => {
   console.log('Setting up users')

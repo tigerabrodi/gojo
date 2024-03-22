@@ -1,3 +1,4 @@
+import overpassFont from '@fontsource-variable/overpass/index.css'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
   Links,
@@ -9,20 +10,20 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 import { Analytics } from '@vercel/analytics/react'
-import rootStyles from './styles/root.css'
-import overpassFont from '@fontsource-variable/overpass/index.css'
 import {
   type LinksFunction,
   type LoaderFunctionArgs,
   type MetaFunction,
   json,
 } from '@vercel/remix'
-import { getAuthFromRequest } from './auth/auth'
-import { Navigation, navigationLinks } from './components'
-import { getToast } from 'remix-toast'
 import { useEffect } from 'react'
 import { ToastContainer, toast as notify } from 'react-toastify'
 import toastStyles from 'react-toastify/dist/ReactToastify.css'
+import { getToast } from 'remix-toast'
+
+import { getAuthFromRequest } from './auth/auth'
+import { Navigation, navigationLinks } from './components'
+import rootStyles from './styles/root.css'
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),

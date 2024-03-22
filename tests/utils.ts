@@ -1,5 +1,7 @@
-import { faker } from '@faker-js/faker'
 import crypto from 'crypto'
+
+import { faker } from '@faker-js/faker'
+
 import { prisma } from '~/db'
 
 export function createRandomUser() {

@@ -1,7 +1,10 @@
 import type { LinksFunction } from '@vercel/remix'
-import navigationStyles from './Navigation.css'
-import { Kakashi } from '~/icons'
+
 import { Link, useLocation } from '@remix-run/react'
+
+import navigationStyles from './Navigation.css'
+
+import { Kakashi } from '~/icons'
 
 export const NAVIGATION_PORTAL_ID = 'navigation-portal'
 

@@ -1,4 +1,5 @@
 import { test } from '@playwright/test'
+
 import { createRandomUser } from './utils'
 
 test('Register and Login', async ({ page }) => {

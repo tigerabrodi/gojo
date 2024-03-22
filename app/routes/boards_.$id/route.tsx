@@ -3,9 +3,12 @@ import type {
   LinksFunction,
   LoaderFunctionArgs,
 } from '@vercel/remix'
-import { json } from '@vercel/remix'
-import { requireAuthCookie } from '~/auth'
+import type { CardType } from '~/helpers'
+
+import { parseWithZod } from '@conform-to/zod'
 import { invariant } from '@epic-web/invariant'
+import { LiveList, LiveObject } from '@liveblocks/client'
+import { ClientSideSuspense } from '@liveblocks/react'
 import {
   Link,
   Outlet,
@@ -13,18 +16,23 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react'
+import { json } from '@vercel/remix'
+import { useEffect, type MouseEvent, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { toast } from 'react-toastify'
+import { redirectWithError } from 'remix-toast'
+import { v1 } from 'uuid'
+import { z } from 'zod'
+
 import {
-  RoomProvider,
-  useEventListener,
-  useMutation,
-  useMyPresence,
-  useOthers,
-  useStorage,
-} from '~/liveblocks.config'
-import { LiveList, LiveObject } from '@liveblocks/client'
-import { ClientSideSuspense } from '@liveblocks/react'
+  updateBoardLastOpenedAt,
+  updateBoardName,
+  upsertUserBoardRole,
+} from './queries'
 import styles from './styles.css'
-import { Kakashi, People, Trash } from '~/icons'
+import { checkUserAllowedToEnterBoardWithSecretId } from './validate'
+
+import { requireAuthCookie } from '~/auth'
 import {
   CARD_DIMENSIONS,
   Card,
@@ -33,27 +41,22 @@ import {
   cursorLinks,
   Cursor,
 } from '~/components'
-import { createPortal } from 'react-dom'
-import {
-  updateBoardLastOpenedAt,
-  updateBoardName,
-  upsertUserBoardRole,
-} from './queries'
-import type { CardType } from '~/helpers'
-import { FORM_INTENTS, INTENT } from '~/helpers'
-import { z } from 'zod'
-import { parseWithZod } from '@conform-to/zod'
-import { useEffect, type MouseEvent, useRef } from 'react'
-import { v1 } from 'uuid'
 import {
   checkUserAllowedToEditBoard,
   getUserFromDB,
   getUserRoleForBoard,
 } from '~/db'
-import { toast } from 'react-toastify'
-import { redirectWithError } from 'remix-toast'
-import { checkUserAllowedToEnterBoardWithSecretId } from './validate'
+import { FORM_INTENTS, INTENT } from '~/helpers'
 import { getColorWithId } from '~/helpers/functions'
+import { Kakashi, People, Trash } from '~/icons'
+import {
+  RoomProvider,
+  useEventListener,
+  useMutation,
+  useMyPresence,
+  useOthers,
+  useStorage,
+} from '~/liveblocks.config'
 
 export const handle = {
   shouldHideRootNavigation: true,

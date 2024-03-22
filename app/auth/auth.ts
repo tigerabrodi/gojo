@@ -1,5 +1,7 @@
 import type { LoaderFunctionArgs } from '@vercel/remix'
+
 import { createCookie, redirect } from '@vercel/remix'
+
 import { env } from '~/helpers/env'
 
 let secret = env.COOKIE_SECRET || 'default'

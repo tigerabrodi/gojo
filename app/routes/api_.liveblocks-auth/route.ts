@@ -1,7 +1,8 @@
-import { requireAuthCookie } from '~/auth'
-import { prisma } from '~/db/prisma'
 import { invariant } from '@epic-web/invariant'
 import { redirect, type ActionFunctionArgs } from '@vercel/remix'
+
+import { requireAuthCookie } from '~/auth'
+import { prisma } from '~/db/prisma'
 import { liveblocks } from '~/helpers/liveblocks'
 
 export const action = async ({ request }: ActionFunctionArgs) => {

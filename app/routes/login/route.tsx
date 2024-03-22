@@ -1,12 +1,15 @@
+import type { LinksFunction } from '@vercel/remix'
+
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { Form, useActionData, useNavigation } from '@remix-run/react'
+import { redirect } from '@vercel/remix'
 import { z } from 'zod'
+
+import { login } from './queries'
+
 import { redirectIfLoggedInLoader, setAuthOnResponse } from '~/auth'
 import { FORM_INTENTS, INTENT } from '~/helpers'
-import { login } from './queries'
-import type { LinksFunction } from '@vercel/remix'
-import { redirect } from '@vercel/remix'
 import authStyles from '~/styles/auth.css'
 
 export const loader = redirectIfLoggedInLoader

@@ -1,0 +1,67 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "@remix-run/eslint-config",
+    "@remix-run/eslint-config/node"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  },
+  "rules": {
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-redeclare": "error",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variable",
+        "types": ["boolean"],
+        "format": ["PascalCase"],
+        "prefix": ["is", "should", "has", "are", "can", "was"]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "TSEnumDeclaration",
+        "message": "Don't declare enums"
+      }
+    ],
+    "@typescript-eslint/array-type": ["error", { "default": "generic" }],
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": true,
+        "checksConditionals": true,
+        "checksSpreads": true
+      }
+    ],
+    "no-await-in-loop": "error",
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always",
+        "groups": [
+          "type",
+          "builtin",
+          "external",
+          ["parent", "sibling"],
+          "index"
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "remix.config.js"
+  ]
+}

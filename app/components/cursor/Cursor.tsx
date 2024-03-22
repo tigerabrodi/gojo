@@ -1,4 +1,5 @@
 import type { LinksFunction } from '@vercel/remix'
+
 import cursorStyles from './Cursor.css'
 
 type Props = {
@@ -35,7 +36,7 @@ export function Cursor({ color, name, x, y }: Props) {
 }
 
 declare module 'react' {
-  interface CSSProperties {
+  type CSSProperties = {
     [key: `--${string}`]: string | number
   }
 }

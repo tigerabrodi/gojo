@@ -1,3 +1,13 @@
+import type { SubmissionResult } from '@conform-to/react'
+import type {
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
+  LinksFunction,
+} from '@vercel/remix'
+
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { parseWithZod } from '@conform-to/zod'
+import { invariant } from '@epic-web/invariant'
 import { Dialog } from '@headlessui/react'
 import {
   Form,
@@ -7,26 +17,19 @@ import {
   useNavigate,
   useNavigation,
 } from '@remix-run/react'
-import { z } from 'zod'
-import { parseWithZod } from '@conform-to/zod'
-import { FORM_INTENTS, INTENT } from '~/helpers'
-import type { SubmissionResult } from '@conform-to/react'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { json } from '@vercel/remix'
-import type {
-  LoaderFunctionArgs,
-  ActionFunctionArgs,
-  LinksFunction,
-} from '@vercel/remix'
-import styles from './styles.css'
-import { Close, Link as LinkIcon } from '~/icons'
-import { requireAuthCookie } from '~/auth'
-import { invariant } from '@epic-web/invariant'
-import { addNewBoardMember, getAllBoardRoles, getBoardById } from './queries'
-import { checkUserAllowedToEditBoard } from '~/db'
-import { jsonWithSuccess, redirectWithError } from 'remix-toast'
-import { useEffect } from 'react'
 import { useCopyToClipboard } from '@uidotdev/usehooks'
+import { json } from '@vercel/remix'
+import { useEffect } from 'react'
+import { jsonWithSuccess, redirectWithError } from 'remix-toast'
+import { z } from 'zod'
+
+import { addNewBoardMember, getAllBoardRoles, getBoardById } from './queries'
+import styles from './styles.css'
+
+import { requireAuthCookie } from '~/auth'
+import { checkUserAllowedToEditBoard } from '~/db'
+import { FORM_INTENTS, INTENT } from '~/helpers'
+import { Close, Link as LinkIcon } from '~/icons'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
@@ -74,7 +77,7 @@ export default function BoardShareRoute() {
   const [form, fields] = useForm({
     // We throw 403 json from action if user is not allowed to edit board
     // Happens only on API requests
-    lastResult: lastResult as SubmissionResult<string[]>,
+    lastResult: lastResult as SubmissionResult<Array<string>>,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
     },
@@ -150,11 +153,11 @@ export default function BoardShareRoute() {
 
         <div className="panel-footer">
           <div className="copy-link-wrapper">
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <button type="button" onClick={() => copyToClipboard(shareLink)}>
               <LinkIcon />
               <span>Copy link</span>
             </button>
-
             <p>
               {hasCopiedText
                 ? 'Copied to clipboard!'

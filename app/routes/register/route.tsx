@@ -1,14 +1,17 @@
-import { Form, useActionData, useNavigation } from '@remix-run/react'
-import { z } from 'zod'
-import { parseWithZod } from '@conform-to/zod'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import type { ActionFunctionArgs, LinksFunction } from '@vercel/remix'
-import { redirectIfLoggedInLoader, setAuthOnResponse } from '~/auth'
+
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { parseWithZod } from '@conform-to/zod'
+import { Form, useActionData, useNavigation } from '@remix-run/react'
+import { redirectWithSuccess } from 'remix-toast'
+import { z } from 'zod'
+
 import { createUser } from './queries'
 import { checkUserExists } from './validate'
-import authStyles from '~/styles/auth.css'
+
+import { redirectIfLoggedInLoader, setAuthOnResponse } from '~/auth'
 import { FORM_INTENTS, INTENT } from '~/helpers'
-import { redirectWithSuccess } from 'remix-toast'
+import authStyles from '~/styles/auth.css'
 
 export const loader = redirectIfLoggedInLoader
 
@@ -138,9 +141,9 @@ export async function action({ request }: ActionFunctionArgs) {
     })
   }
 
-  const userExists = await checkUserExists(email)
+  const isUserAlreadyExisting = await checkUserExists(email)
 
-  if (userExists) {
+  if (isUserAlreadyExisting) {
     return submission.reply({
       fieldErrors: {
         email: ['User with this email already exists.'],
