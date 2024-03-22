@@ -163,13 +163,8 @@ test('Board collaboration complete simple flow', async ({ browser }) => {
   }
 
   await user2Page.mouse.move(
-    initialCardUser2Position.x + 5,
-    initialCardUser2Position.y + 5
-  )
-
-  await user2Page.mouse.move(
-    initialCardUser2Position.x + 200,
-    initialCardUser2Position.y + 200
+    initialCardUser2Position.x + 250,
+    initialCardUser2Position.y + 250
   )
 
   await user2Page.mouse.up()
@@ -186,8 +181,8 @@ test('Board collaboration complete simple flow', async ({ browser }) => {
   }
 
   // Assert that the card's position has changed for User 1
-  expect(newCardUser1Position.x).toBeLessThan(initialCardUser1Position.x)
-  expect(newCardUser1Position.y).toBeLessThan(initialCardUser1Position.y)
+  expect(newCardUser1Position.x).toBeGreaterThan(initialCardUser1Position.x)
+  expect(newCardUser1Position.y).toBeGreaterThan(initialCardUser1Position.y)
 
   // Assert that the card's position for User 1 and User 2 are the same after the drag operation
   expect(newCardUser1Position.x).toBe(newCardUser2Position.x)
