@@ -1,4 +1,3 @@
-import type { FocusEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useMyPresence, useOthers, useStorage } from "~/liveblocks.config";
 import type { CardType } from "~/helpers";
@@ -42,6 +41,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
@@ -57,36 +57,60 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   const { bringCardToFront, onDelete, updateCardPosition, updateCardContent } =
     useGetCardLiveblocksQueries();
 
-  function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
-    // If the card content is focused, we don't want to start dragging the card
-    // User is editing the text
-    const isCardContentCurrentlyFocused =
-      document.activeElement === cardContentRef.current;
-    if (isCardContentCurrentlyFocused) {
+  useEffect(() => {
+    if (isDragging) {
+      function handleGlobalMouseMove(event: MouseEvent) {
+        if (!isDragging) return;
+        const newX = event.clientX - startPosition.x;
+        const newY = event.clientY - startPosition.y;
+        updateCardPosition(card.id, newX, newY);
+      }
+
+      function handleGlobalMouseUp() {
+        setIsDragging(false);
+        window.removeEventListener("mousemove", handleGlobalMouseMove);
+        window.removeEventListener("mouseup", handleGlobalMouseUp);
+      }
+
+      window.addEventListener("mousemove", handleGlobalMouseMove);
+      window.addEventListener("mouseup", handleGlobalMouseUp);
+
+      return () => {
+        window.removeEventListener("mousemove", handleGlobalMouseMove);
+        window.removeEventListener("mouseup", handleGlobalMouseUp);
+      };
+    }
+  }, [
+    card.id,
+    isDragging,
+    startPosition.x,
+    startPosition.y,
+    updateCardPosition,
+  ]);
+
+  function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    if (document.activeElement === cardContentRef.current) {
       return;
     }
 
+    const startX = event.clientX;
+    const startY = event.clientY;
+
     setIsDragging(true);
+
     setStartPosition({
-      x: event.clientX - card.positionX,
-      y: event.clientY - card.positionY,
+      x: startX - card.positionX,
+      y: startY - card.positionY,
     });
+
+    // Needed to prevent focusing card content when dragging
     event.preventDefault();
-    event.currentTarget.focus();
+
+    // In turn, we have to focus on the card itself manually
+    cardRef.current?.focus();
   }
 
-  function handleMouseMove(event: MouseEvent<HTMLDivElement>) {
-    if (!isDragging) return;
-    const newX = event.clientX - startPosition.x;
-    const newY = event.clientY - startPosition.y;
-    updateCardPosition(card.id, newX, newY);
-  }
-
-  function handleMouseUp() {
-    setIsDragging(false);
-  }
-
-  function handleInput(event: FormEvent<HTMLSpanElement>) {
+  function handleInput(event: React.FormEvent<HTMLSpanElement>) {
     const newHtml = event.currentTarget.innerHTML || "";
     const purifiedHtml = DOMPurify.sanitize(newHtml);
     setContent(purifiedHtml);
@@ -103,7 +127,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [content]);
 
-  function onCardBlur(event: FocusEvent<HTMLDivElement>) {
+  function onCardBlur(event: React.FocusEvent<HTMLDivElement>) {
     // If we're focusing on card content, card's blur should not be triggered
     if (event.relatedTarget === cardContentRef.current) return;
 
@@ -137,7 +161,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardPosition(card.id, newX, newY);
   }
 
-  function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  function onCardKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
       return;
@@ -222,11 +246,10 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       role="button"
       tabIndex={0}
       className="card"
+      ref={cardRef}
       id={card.id}
       aria-label={`${formatOrdinals(index + 1)} card`}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
       onBlur={onCardBlur}
       onFocus={onCardFocus}
       onKeyDown={onCardKeyDown}
