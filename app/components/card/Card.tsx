@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
-import { useMyPresence, useOthers, useStorage } from '~/liveblocks.config'
-import type { CardType } from '~/helpers'
-import styles from './Card.css'
 import type { LinksFunction } from '@vercel/remix'
-import { moveCursorToEnd } from './utils'
+import type { CardType } from '~/helpers'
+
 import * as Toolbar from '@radix-ui/react-toolbar'
-import { Trash } from '~/icons'
-import { formatOrdinals, getColorWithId } from '~/helpers/functions'
 import DOMPurify from 'dompurify'
+import { useEffect, useRef, useState } from 'react'
+
+import styles from './Card.css'
 import { useGetCardLiveblocksQueries } from './liveblocks-queries'
+import { moveCursorToEnd } from './utils'
+
+import { formatOrdinals, getColorWithId } from '~/helpers/functions'
+import { Trash } from '~/icons'
+import { useMyPresence, useOthers, useStorage } from '~/liveblocks.config'
 
 export const CARD_DIMENSIONS = {
   width: 200,
@@ -46,7 +49,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     useState(false)
 
   const cardContentRef = useRef<HTMLDivElement>(null)
-  const cardRef = useRef<HTMLButtonElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const [, updateMyPresence] = useMyPresence()
   const others = useOthers()
@@ -63,20 +66,20 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     useGetCardLiveblocksQueries()
 
   useEffect(() => {
+    function handleGlobalMouseMove(event: MouseEvent) {
+      if (!isDragging) return
+      const newX = event.clientX - dragStartOffset.x
+      const newY = event.clientY - dragStartOffset.y
+      updateCardPosition(card.id, newX, newY)
+    }
+
+    function handleGlobalMouseUp() {
+      setIsDragging(false)
+      window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('mouseup', handleGlobalMouseUp)
+    }
+
     if (isDragging) {
-      function handleGlobalMouseMove(event: MouseEvent) {
-        if (!isDragging) return
-        const newX = event.clientX - dragStartOffset.x
-        const newY = event.clientY - dragStartOffset.y
-        updateCardPosition(card.id, newX, newY)
-      }
-
-      function handleGlobalMouseUp() {
-        setIsDragging(false)
-        window.removeEventListener('mousemove', handleGlobalMouseMove)
-        window.removeEventListener('mouseup', handleGlobalMouseUp)
-      }
-
       window.addEventListener('mousemove', handleGlobalMouseMove)
       window.addEventListener('mouseup', handleGlobalMouseUp)
 
@@ -93,7 +96,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardPosition,
   ])
 
-  function handleMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
     const isUserEditingCardContent =
       document.activeElement === cardContentRef.current
     if (isUserEditingCardContent) {
@@ -134,7 +137,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [content])
 
-  function onCardBlur(event: React.FocusEvent<HTMLButtonElement>) {
+  function onCardBlur(event: React.FocusEvent<HTMLDivElement>) {
     const isUserFocusingOnCardContent =
       event.relatedTarget === cardContentRef.current
     if (isUserFocusingOnCardContent) return
@@ -169,7 +172,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardPosition(card.id, newX, newY)
   }
 
-  function onCardKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+  function onCardKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Escape' && cardContentRef.current) {
       cardContentRef.current.blur()
       return
@@ -250,7 +253,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       className="card"
       ref={cardRef}
       id={card.id}
@@ -316,6 +321,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
-    </button>
+    </div>
   )
 }
