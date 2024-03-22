@@ -66,24 +66,24 @@ Liveblocks storage type code:
 
 ```tsx
 type Storage = {
-  cards: LiveList<LiveObject<CardType>>;
-  zIndexOrderListWithCardIds: LiveList<string>;
-  boardName: string;
-};
+  cards: LiveList<LiveObject<CardType>>
+  zIndexOrderListWithCardIds: LiveList<string>
+  boardName: string
+}
 ```
 
 Code inside Card component for bringing cards to the front:
 
 ```tsx
 const bringCardToFront = useMutation(({ storage }, cardId: string) => {
-  const zIndexOrderListWithCardIds = storage.get("zIndexOrderListWithCardIds");
-  const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId);
+  const zIndexOrderListWithCardIds = storage.get('zIndexOrderListWithCardIds')
+  const index = zIndexOrderListWithCardIds.findIndex((id) => id === cardId)
 
   if (index !== -1) {
-    zIndexOrderListWithCardIds.delete(index);
-    zIndexOrderListWithCardIds.push(cardId);
+    zIndexOrderListWithCardIds.delete(index)
+    zIndexOrderListWithCardIds.push(cardId)
   }
-}, []);
+}, [])
 ```
 
 ## Side note
@@ -169,7 +169,7 @@ Code for mapping out the cursor component:
 {
   others.map(({ connectionId, presence }) => {
     if (presence.cursor === null) {
-      return null;
+      return null
     }
 
     return (
@@ -180,8 +180,8 @@ Code for mapping out the cursor component:
         y={presence.cursor.y}
         name={presence.name}
       />
-    );
-  });
+    )
+  })
 }
 ```
 
@@ -211,7 +211,7 @@ Get color with id function:
 
 ```tsx
 export function getColorWithId(id: number) {
-  return COLORS[id % COLORS.length];
+  return COLORS[id % COLORS.length]
 }
 ```
 
@@ -220,19 +220,19 @@ At scale where we expect many users on a single board, we'd need to make sure to
 Cursor component:
 
 ```tsx
-import type { LinksFunction } from "@vercel/remix";
-import cursorStyles from "./Cursor.css";
+import type { LinksFunction } from '@vercel/remix'
+import cursorStyles from './Cursor.css'
 
 type Props = {
-  color: string;
-  name: string;
-  x: number;
-  y: number;
-};
+  color: string
+  name: string
+  x: number
+  y: number
+}
 
 export const cursorLinks: LinksFunction = () => [
-  { rel: "stylesheet", href: cursorStyles },
-];
+  { rel: 'stylesheet', href: cursorStyles },
+]
 
 export function Cursor({ color, name, x, y }: Props) {
   return (
@@ -240,7 +240,7 @@ export function Cursor({ color, name, x, y }: Props) {
       className="cursor"
       style={{
         transform: `translateX(${x}px) translateY(${y}px)`,
-        "--colors-cursor": color,
+        '--colors-cursor': color,
       }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 15 22">
@@ -253,7 +253,7 @@ export function Cursor({ color, name, x, y }: Props) {
       </svg>
       <span>{name}</span>
     </div>
-  );
+  )
 }
 ```
 
@@ -277,21 +277,21 @@ Code when clicking on the card:
 ```tsx
 function onCardClick() {
   const isCardContentCurrentlyFocused =
-    document.activeElement === cardContentRef.current;
+    document.activeElement === cardContentRef.current
 
-  if (isCardContentCurrentlyFocused) return;
+  if (isCardContentCurrentlyFocused) return
 
   if (!hasCardBeenClickedBefore) {
-    setHasCardBeenClickedBefore(true);
-    return;
+    setHasCardBeenClickedBefore(true)
+    return
   }
 
   if (cardContentRef.current) {
-    cardContentRef.current.focus();
-    moveCursorToEnd(cardContentRef.current);
-    setIsCardContentFocused(true);
-    scrollToTheBottomOfCardContent();
-    updateMyPresence({ isTyping: true });
+    cardContentRef.current.focus()
+    moveCursorToEnd(cardContentRef.current)
+    setIsCardContentFocused(true)
+    scrollToTheBottomOfCardContent()
+    updateMyPresence({ isTyping: true })
   }
 }
 ```
@@ -306,7 +306,7 @@ Code for focusing on card:
 function onCardFocus() {
   updateMyPresence({
     selectedCardId: card.id,
-  });
+  })
 }
 ```
 
@@ -323,12 +323,12 @@ Code for card blur:
 ```tsx
 function onCardBlur(event: FocusEvent<HTMLDivElement>) {
   // If we're focusing on card content, card's blur should not be triggered
-  if (event.relatedTarget === cardContentRef.current) return;
+  if (event.relatedTarget === cardContentRef.current) return
 
-  cardContentRef.current?.blur();
-  setIsCardContentFocused(false);
-  setHasCardBeenClickedBefore(false);
-  updateMyPresence({ isTyping: false, selectedCardId: null });
+  cardContentRef.current?.blur()
+  setIsCardContentFocused(false)
+  setHasCardBeenClickedBefore(false)
+  updateMyPresence({ isTyping: false, selectedCardId: null })
 }
 ```
 
@@ -337,10 +337,10 @@ How do we know someone is selecting what card?
 We get that from the `useOthers` hook.
 
 ```js
-const others = useOthers();
+const others = useOthers()
 const personFocusingOnThisCard = others.find(
   (person) => person.presence.selectedCardId === card.id
-);
+)
 ```
 
 What's the UI for showing who is editing what card?
@@ -358,7 +358,7 @@ If someone else is focusing on a card, we update the styling and also display th
     >
       {personFocusingOnThisCard.presence.name}
     </div>
-  );
+  )
 }
 ```
 
@@ -376,61 +376,61 @@ However, we don't want this to happen if you're editing the text. That would oth
 Code for moving the card with arrow keys:
 
 ```tsx
-function handleCardMove(direction: "up" | "down" | "left" | "right") {
-  let newX = card.positionX;
-  let newY = card.positionY;
+function handleCardMove(direction: 'up' | 'down' | 'left' | 'right') {
+  let newX = card.positionX
+  let newY = card.positionY
 
   switch (direction) {
-    case "up":
-      newY -= 10;
-      break;
-    case "down":
-      newY += 10;
-      break;
-    case "left":
-      newX -= 10;
-      break;
-    case "right":
-      newX += 10;
-      break;
+    case 'up':
+      newY -= 10
+      break
+    case 'down':
+      newY += 10
+      break
+    case 'left':
+      newX -= 10
+      break
+    case 'right':
+      newX += 10
+      break
     default:
-      break;
+      break
   }
 
-  updateCardPosition(card.id, newX, newY);
+  updateCardPosition(card.id, newX, newY)
 }
 
 function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-  if (event.key === "Escape" && cardContentRef.current) {
-    cardContentRef.current.blur();
-    return;
+  if (event.key === 'Escape' && cardContentRef.current) {
+    cardContentRef.current.blur()
+    return
   }
 
   // If user editing text, moving card with arrow keys should not be triggered
-  if (cardContentRef.current === document.activeElement) return;
+  if (cardContentRef.current === document.activeElement) return
 
-  const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
+  const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS]
 
   if (arrowKey) {
     switch (event.key) {
-      case "ArrowUp":
-        handleCardMove("up");
-        break;
-      case "ArrowDown":
-        handleCardMove("down");
-        break;
-      case "ArrowLeft":
-        handleCardMove("left");
-        break;
-      case "ArrowRight":
-        handleCardMove("right");
-        break;
+      case 'ArrowUp':
+        handleCardMove('up')
+        break
+      case 'ArrowDown':
+        handleCardMove('down')
+        break
+      case 'ArrowLeft':
+        handleCardMove('left')
+        break
+      case 'ArrowRight':
+        handleCardMove('right')
+        break
       default:
-        break;
+        break
     }
 
     // Prevent the page from scrolling when using arrow keys
-    event.preventDefault();
+    event.preventDefault()
   }
 }
 ```

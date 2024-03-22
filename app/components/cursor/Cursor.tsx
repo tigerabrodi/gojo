@@ -1,16 +1,16 @@
-import type { LinksFunction } from "@vercel/remix";
-import cursorStyles from "./Cursor.css";
+import type { LinksFunction } from '@vercel/remix'
+import cursorStyles from './Cursor.css'
 
 type Props = {
-  color: string;
-  name: string;
-  x: number;
-  y: number;
-};
+  color: string
+  name: string
+  x: number
+  y: number
+}
 
 export const cursorLinks: LinksFunction = () => [
-  { rel: "stylesheet", href: cursorStyles },
-];
+  { rel: 'stylesheet', href: cursorStyles },
+]
 
 export function Cursor({ color, name, x, y }: Props) {
   return (
@@ -18,7 +18,7 @@ export function Cursor({ color, name, x, y }: Props) {
       className="cursor"
       style={{
         transform: `translateX(${x}px) translateY(${y}px)`,
-        "--colors-cursor": color,
+        '--colors-cursor': color,
       }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 15 22">
@@ -31,11 +31,11 @@ export function Cursor({ color, name, x, y }: Props) {
       </svg>
       <span>{name}</span>
     </div>
-  );
+  )
 }
 
-declare module "react" {
+declare module 'react' {
   interface CSSProperties {
-    [key: `--${string}`]: string | number;
+    [key: `--${string}`]: string | number
   }
 }

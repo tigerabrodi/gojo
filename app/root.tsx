@@ -1,4 +1,4 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
+import { cssBundleHref } from '@remix-run/css-bundle'
 import {
   Links,
   LiveReload,
@@ -7,57 +7,57 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-} from "@remix-run/react";
-import { Analytics } from "@vercel/analytics/react";
-import rootStyles from "./styles/root.css";
-import overpassFont from "@fontsource-variable/overpass/index.css";
+} from '@remix-run/react'
+import { Analytics } from '@vercel/analytics/react'
+import rootStyles from './styles/root.css'
+import overpassFont from '@fontsource-variable/overpass/index.css'
 import {
   type LinksFunction,
   type LoaderFunctionArgs,
   type MetaFunction,
   json,
-} from "@vercel/remix";
-import { getAuthFromRequest } from "./auth/auth";
-import { Navigation, navigationLinks } from "./components";
-import { getToast } from "remix-toast";
-import { useEffect } from "react";
-import { ToastContainer, toast as notify } from "react-toastify";
-import toastStyles from "react-toastify/dist/ReactToastify.css";
+} from '@vercel/remix'
+import { getAuthFromRequest } from './auth/auth'
+import { Navigation, navigationLinks } from './components'
+import { getToast } from 'remix-toast'
+import { useEffect } from 'react'
+import { ToastContainer, toast as notify } from 'react-toastify'
+import toastStyles from 'react-toastify/dist/ReactToastify.css'
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   ...navigationLinks(),
-  { rel: "stylesheet", href: rootStyles },
-  { rel: "stylesheet", href: overpassFont },
-  { rel: "stylesheet", href: toastStyles },
-];
+  { rel: 'stylesheet', href: rootStyles },
+  { rel: 'stylesheet', href: overpassFont },
+  { rel: 'stylesheet', href: toastStyles },
+]
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Gojo" },
+    { title: 'Gojo' },
     {
-      name: "description",
+      name: 'description',
       content:
-        "Gojo is a site where you can brainstorm ideas with friends in real-time.",
+        'Gojo is a site where you can brainstorm ideas with friends in real-time.',
     },
-  ];
-};
+  ]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const userId = await getAuthFromRequest(request);
+  const userId = await getAuthFromRequest(request)
 
-  const { toast, headers } = await getToast(request);
-  return json({ toast, isAuthenticated: Boolean(userId) }, { headers });
+  const { toast, headers } = await getToast(request)
+  return json({ toast, isAuthenticated: Boolean(userId) }, { headers })
 }
 
 export default function App() {
-  const { isAuthenticated, toast } = useLoaderData<typeof loader>();
+  const { isAuthenticated, toast } = useLoaderData<typeof loader>()
 
   useEffect(() => {
     if (toast) {
-      notify(toast.message, { type: toast.type });
+      notify(toast.message, { type: toast.type })
     }
-  }, [toast]);
+  }, [toast])
 
   return (
     <html lang="en">
@@ -77,5 +77,5 @@ export default function App() {
         <Analytics />
       </body>
     </html>
-  );
+  )
 }

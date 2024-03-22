@@ -2,74 +2,52 @@
   "export function": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "exp",
-    "body": [
-      "export function $1 () {",
-      "return ($2)",
-      "}"
-    ]
+    "body": ["export function $1 () {", "return ($2)", "}"],
   },
   "sr only styles": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "sro",
-    "body": [
-      "sr-only"
-    ]
+    "body": ["sr-only"],
   },
   "class": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "cls",
-    "body": [
-      "className=\"$1\""
-    ]
+    "body": ["className=\"$1\""],
   },
   "export everything": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "exev",
-    "body": [
-      "export * from './$1'"
-    ]
+    "body": ["export * from './$1'"],
   },
   "playwright to be defined": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "ebf",
-    "body": [
-      "await expect($1).toBeDefined()"
-    ]
+    "body": ["await expect($1).toBeDefined()"],
   },
   "playwright to be visible": {
     "scope": "typescript,javascript,javascriptreact,typescriptreact",
     "prefix": "ebv",
-    "body": [
-      "await expect($1).toBeVisible()"
-    ]
+    "body": ["await expect($1).toBeVisible()"],
   },
   "Write calculated font size": {
     "scope": "css",
     "prefix": "fnz",
-    "body": [
-      "font-size: calc(1rem * $1 / 16);"
-    ],
-    "description": "Write the font size which calculates pixels and rem divided. Used to better understand the size of the font, but still let them be accessible as rems in the browser."
+    "body": ["font-size: calc(1rem * $1 / 16);"],
+    "description": "Write the font size which calculates pixels and rem divided. Used to better understand the size of the font, but still let them be accessible as rems in the browser.",
   },
   "Write media query": {
     "scope": "css",
     "prefix": "mdq",
-    "body": [
-      "@media screen and (min-width: $1) {$2}"
-    ]
+    "body": ["@media screen and (min-width: $1) {$2}"],
   },
   "colors primary": {
     "scope": "css",
     "prefix": "clrp",
-    "body": [
-      "var(--colors-primary-$1)"
-    ]
+    "body": ["var(--colors-primary-$1)"],
   },
   "colors": {
     "scope": "css",
     "prefix": "clr",
-    "body": [
-      "var(--colors-$1)"
-    ]
-  }
+    "body": ["var(--colors-$1)"],
+  },
 }

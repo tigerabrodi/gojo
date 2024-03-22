@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function cleanUp() {
   // Delete all boards associated with users matching the test pattern
@@ -10,30 +10,30 @@ async function cleanUp() {
         some: {
           user: {
             email: {
-              contains: "test_",
-              endsWith: "@example.com",
+              contains: 'test_',
+              endsWith: '@example.com',
             },
           },
         },
       },
     },
-  });
+  })
 
   // Delete users with email addresses matching the test pattern
   await prisma.user.deleteMany({
     where: {
       email: {
-        contains: "test_",
-        endsWith: "@example.com",
+        contains: 'test_',
+        endsWith: '@example.com',
       },
     },
-  });
+  })
 
-  await prisma.$disconnect();
+  await prisma.$disconnect()
 }
 
 export default async function globalTeardown() {
   cleanUp().then(() => {
-    console.log("Cleaned up the database.");
-  });
+    console.log('Cleaned up the database.')
+  })
 }

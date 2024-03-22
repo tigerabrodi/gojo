@@ -1,3 +1,3 @@
-import { redirectFromRoot } from "~/auth";
+import { redirectFromRoot } from '~/auth'
 
-export const loader = redirectFromRoot;
+export const loader = redirectFromRoot

@@ -8,5 +8,5 @@ export function People() {
         clipRule="evenodd"
       />
     </svg>
-  );
+  )
 }

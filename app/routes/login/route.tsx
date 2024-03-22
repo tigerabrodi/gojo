@@ -1,33 +1,33 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
-import { Form, useActionData, useNavigation } from "@remix-run/react";
-import { z } from "zod";
-import { redirectIfLoggedInLoader, setAuthOnResponse } from "~/auth";
-import { FORM_INTENTS, INTENT } from "~/helpers";
-import { login } from "./queries";
-import type { LinksFunction } from "@vercel/remix";
-import { redirect } from "@vercel/remix";
-import authStyles from "~/styles/auth.css";
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { parseWithZod } from '@conform-to/zod'
+import { Form, useActionData, useNavigation } from '@remix-run/react'
+import { z } from 'zod'
+import { redirectIfLoggedInLoader, setAuthOnResponse } from '~/auth'
+import { FORM_INTENTS, INTENT } from '~/helpers'
+import { login } from './queries'
+import type { LinksFunction } from '@vercel/remix'
+import { redirect } from '@vercel/remix'
+import authStyles from '~/styles/auth.css'
 
-export const loader = redirectIfLoggedInLoader;
+export const loader = redirectIfLoggedInLoader
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: authStyles },
-];
+  { rel: 'stylesheet', href: authStyles },
+]
 
 export default function Login() {
-  const lastResult = useActionData<typeof action>();
-  const navigation = useNavigation();
+  const lastResult = useActionData<typeof action>()
+  const navigation = useNavigation()
 
   const [form, fields] = useForm({
     lastResult: lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema });
+      return parseWithZod(formData, { schema })
     },
-    shouldValidate: "onSubmit",
-  });
+    shouldValidate: 'onSubmit',
+  })
 
-  const isSubmitting = navigation.formData?.get(INTENT) === FORM_INTENTS.login;
+  const isSubmitting = navigation.formData?.get(INTENT) === FORM_INTENTS.login
 
   return (
     <main>
@@ -43,7 +43,7 @@ export default function Login() {
           <div className="group">
             <label htmlFor={fields.email.id}>Email</label>
             <input
-              {...getInputProps(fields.email, { type: "email" })}
+              {...getInputProps(fields.email, { type: 'email' })}
               placeholder="johnkun@gmail.com"
             />
             {!fields.email.valid && (
@@ -61,7 +61,7 @@ export default function Login() {
               </span>
             </div>
             <input
-              {...getInputProps(fields.password, { type: "password" })}
+              {...getInputProps(fields.password, { type: 'password' })}
               placeholder="Password"
             />
             {!fields.password.valid && (
@@ -81,36 +81,36 @@ export default function Login() {
         </button>
       </Form>
     </main>
-  );
+  )
 }
 
 const schema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string().email({ message: 'Invalid email address' }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
+    .min(6, { message: 'Password must be at least 6 characters' }),
+})
 
 export async function action({ request }: { request: Request }) {
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema });
+  const formData = await request.formData()
+  const submission = parseWithZod(formData, { schema })
 
-  if (submission.status !== "success") {
-    return submission.reply();
+  if (submission.status !== 'success') {
+    return submission.reply()
   }
 
-  const { email, password } = submission.value;
+  const { email, password } = submission.value
 
-  const userId = await login(email, password);
+  const userId = await login(email, password)
   if (!userId) {
     return submission.reply({
       fieldErrors: {
-        email: ["Invalid email or password."],
+        email: ['Invalid email or password.'],
       },
-    });
+    })
   }
 
-  let response = redirect("/boards");
+  let response = redirect('/boards')
   // TODO: Toast message
-  return setAuthOnResponse(response, userId);
+  return setAuthOnResponse(response, userId)
 }

@@ -1,5 +1,5 @@
-import { redirectWithClearedCookie } from "~/auth";
+import { redirectWithClearedCookie } from '~/auth'
 
 export function action() {
-  return redirectWithClearedCookie();
+  return redirectWithClearedCookie()
 }

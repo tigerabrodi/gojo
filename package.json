@@ -52,6 +52,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.8",
     "eslint": "^8.38.0",
+    "prettier": "^3.2.5",
     "prisma": "^5.10.2",
     "typescript": "^5.1.6"
   },

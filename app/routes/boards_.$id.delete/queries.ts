@@ -1,11 +1,11 @@
-import { prisma } from "~/db";
+import { prisma } from '~/db'
 
 export async function checkIsUserOwnerOfBoard({
   userId,
   boardId,
 }: {
-  userId: string;
-  boardId: string;
+  userId: string
+  boardId: string
 }) {
   const boardRole = await prisma.boardRole.findUnique({
     where: {
@@ -14,9 +14,9 @@ export async function checkIsUserOwnerOfBoard({
         userId,
       },
     },
-  });
+  })
 
-  return boardRole?.role === "Owner";
+  return boardRole?.role === 'Owner'
 }
 
 export async function deleteBoard(boardId: string) {
@@ -24,5 +24,5 @@ export async function deleteBoard(boardId: string) {
     where: {
       id: boardId,
     },
-  });
+  })
 }

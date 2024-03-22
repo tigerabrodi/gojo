@@ -29,13 +29,13 @@ For authentication, the project uses HTTP cookies, which are straightforward to 
 How you declare cookiee in Remix:
 
 ```javascript
-const authCookie = createCookie("auth", {
+const authCookie = createCookie('auth', {
   secrets: [secret],
   maxAge: 30 * 24 * 60 * 60,
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: "lax",
-});
+  secure: env.NODE_ENV === 'production',
+  sameSite: 'lax',
+})
 ```
 
 - secrets: An array of secrets that may be used to sign/unsign the value of a cookie.
@@ -64,14 +64,12 @@ How we create the hash:
 // 16 bytes is the recommended size for a salt
 // Having a salt added to the password before hashing it makes it more secure
 // Reduces the risk of rainbow table attacks: https://en.wikipedia.org/wiki/PBKDF2
-let salt = crypto.randomBytes(16).toString("hex");
+let salt = crypto.randomBytes(16).toString('hex')
 
 // Create a hash
 // 1000 stands for the number of iterations
 // 64 is the length of the output hash
-let hash = crypto
-  .pbkdf2Sync(password, salt, 1000, 64, "sha256")
-  .toString("hex");
+let hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha256').toString('hex')
 ```
 
 The salt is created using `crypto.randomBytes` and the hash is created using `crypto.pbkdf2Sync`.
@@ -80,11 +78,11 @@ How we compare the hash when a user logs in:
 
 ```js
 let hash = crypto
-  .pbkdf2Sync(password, user.Password.salt, 1000, 64, "sha256")
-  .toString("hex");
+  .pbkdf2Sync(password, user.Password.salt, 1000, 64, 'sha256')
+  .toString('hex')
 
 if (hash !== user.Password.hash) {
-  return false;
+  return false
 }
 ```
 

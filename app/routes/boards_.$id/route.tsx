@@ -2,17 +2,17 @@ import type {
   ActionFunctionArgs,
   LinksFunction,
   LoaderFunctionArgs,
-} from "@vercel/remix";
-import { json } from "@vercel/remix";
-import { requireAuthCookie } from "~/auth";
-import { invariant } from "@epic-web/invariant";
+} from '@vercel/remix'
+import { json } from '@vercel/remix'
+import { requireAuthCookie } from '~/auth'
+import { invariant } from '@epic-web/invariant'
 import {
   Link,
   Outlet,
   useFetcher,
   useLoaderData,
   useNavigate,
-} from "@remix-run/react";
+} from '@remix-run/react'
 import {
   RoomProvider,
   useEventListener,
@@ -20,11 +20,11 @@ import {
   useMyPresence,
   useOthers,
   useStorage,
-} from "~/liveblocks.config";
-import { LiveList, LiveObject } from "@liveblocks/client";
-import { ClientSideSuspense } from "@liveblocks/react";
-import styles from "./styles.css";
-import { Kakashi, People, Trash } from "~/icons";
+} from '~/liveblocks.config'
+import { LiveList, LiveObject } from '@liveblocks/client'
+import { ClientSideSuspense } from '@liveblocks/react'
+import styles from './styles.css'
+import { Kakashi, People, Trash } from '~/icons'
 import {
   CARD_DIMENSIONS,
   Card,
@@ -32,87 +32,87 @@ import {
   cardLinks,
   cursorLinks,
   Cursor,
-} from "~/components";
-import { createPortal } from "react-dom";
+} from '~/components'
+import { createPortal } from 'react-dom'
 import {
   updateBoardLastOpenedAt,
   updateBoardName,
   upsertUserBoardRole,
-} from "./queries";
-import type { CardType } from "~/helpers";
-import { FORM_INTENTS, INTENT } from "~/helpers";
-import { z } from "zod";
-import { parseWithZod } from "@conform-to/zod";
-import { useEffect, type MouseEvent, useRef } from "react";
-import { v1 } from "uuid";
+} from './queries'
+import type { CardType } from '~/helpers'
+import { FORM_INTENTS, INTENT } from '~/helpers'
+import { z } from 'zod'
+import { parseWithZod } from '@conform-to/zod'
+import { useEffect, type MouseEvent, useRef } from 'react'
+import { v1 } from 'uuid'
 import {
   checkUserAllowedToEditBoard,
   getUserFromDB,
   getUserRoleForBoard,
-} from "~/db";
-import { toast } from "react-toastify";
-import { redirectWithError } from "remix-toast";
-import { checkUserAllowedToEnterBoardWithSecretId } from "./validate";
-import { getColorWithId } from "~/helpers/functions";
+} from '~/db'
+import { toast } from 'react-toastify'
+import { redirectWithError } from 'remix-toast'
+import { checkUserAllowedToEnterBoardWithSecretId } from './validate'
+import { getColorWithId } from '~/helpers/functions'
 
 export const handle = {
   shouldHideRootNavigation: true,
-};
+}
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
+  { rel: 'stylesheet', href: styles },
   ...cardLinks(),
   ...cursorLinks(),
-];
+]
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const userId = await requireAuthCookie(request);
-  const boardId = params.id;
+  const userId = await requireAuthCookie(request)
+  const boardId = params.id
 
-  invariant(boardId, "No board ID provided");
+  invariant(boardId, 'No board ID provided')
 
-  const currentUrl = new URL(request.url);
-  const secretId = currentUrl.searchParams.get("secretId");
+  const currentUrl = new URL(request.url)
+  const secretId = currentUrl.searchParams.get('secretId')
 
   if (secretId) {
     const isUserAllowedToEnterBoard =
       await checkUserAllowedToEnterBoardWithSecretId({
         boardId,
         secretId,
-      });
+      })
 
     if (!isUserAllowedToEnterBoard) {
-      throw redirectWithError("/boards", {
-        message: "You are not allowed on this board.",
-      });
+      throw redirectWithError('/boards', {
+        message: 'You are not allowed on this board.',
+      })
     }
 
     await upsertUserBoardRole({
       userId,
       boardId,
-    });
+    })
   }
 
-  await updateBoardLastOpenedAt(boardId);
+  await updateBoardLastOpenedAt(boardId)
 
   const [user, boardRole] = await Promise.all([
     getUserFromDB(userId),
     getUserRoleForBoard(userId, boardId),
-  ]);
+  ])
 
   if (!boardRole) {
-    throw redirectWithError("/boards", {
-      message: "You are not allowed on this board.",
-    });
+    throw redirectWithError('/boards', {
+      message: 'You are not allowed on this board.',
+    })
   }
 
-  invariant(user, "User not found");
+  invariant(user, 'User not found')
 
   return json({
     boardId,
     userName: user.name,
     userRole: boardRole.role,
-  });
+  })
 }
 
 function SuspenseFallback() {
@@ -120,11 +120,11 @@ function SuspenseFallback() {
     <main>
       <Kakashi className="suspense-fallback-loader" />
     </main>
-  );
+  )
 }
 
 export default function BoardRoute() {
-  const { boardId, userName } = useLoaderData<typeof loader>();
+  const { boardId, userName } = useLoaderData<typeof loader>()
 
   return (
     <RoomProvider
@@ -137,7 +137,7 @@ export default function BoardRoute() {
       }}
       initialStorage={{
         cards: new LiveList(),
-        boardName: "Untitled board",
+        boardName: 'Untitled board',
         zIndexOrderListWithCardIds: new LiveList(),
       }}
     >
@@ -145,91 +145,91 @@ export default function BoardRoute() {
         {() => <Board />}
       </ClientSideSuspense>
     </RoomProvider>
-  );
+  )
 }
 
 function Board() {
-  const { boardId, userRole } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher();
-  const navigate = useNavigate();
+  const { boardId, userRole } = useLoaderData<typeof loader>()
+  const fetcher = useFetcher()
+  const navigate = useNavigate()
 
-  const boardName = useStorage((root) => root.boardName);
-  const lastSubmittedBoardName = useRef(boardName);
-  const cards = useStorage((root) => root.cards);
-  const others = useOthers();
-  const [, updateMyPresence] = useMyPresence();
+  const boardName = useStorage((root) => root.boardName)
+  const lastSubmittedBoardName = useRef(boardName)
+  const cards = useStorage((root) => root.cards)
+  const others = useOthers()
+  const [, updateMyPresence] = useMyPresence()
 
   useEffect(() => {
     if (boardName === lastSubmittedBoardName.current) {
-      return;
+      return
     }
 
     const handler = setTimeout(() => {
-      const formData = new FormData();
-      formData.append("boardName", boardName);
-      formData.append(INTENT, FORM_INTENTS.updateBoardName);
+      const formData = new FormData()
+      formData.append('boardName', boardName)
+      formData.append(INTENT, FORM_INTENTS.updateBoardName)
 
       fetcher.submit(formData, {
-        method: "post",
-      });
+        method: 'post',
+      })
 
       // Update lastSubmittedBoardName after submitting
-      lastSubmittedBoardName.current = boardName;
-    }, 500);
+      lastSubmittedBoardName.current = boardName
+    }, 500)
 
-    return () => clearTimeout(handler);
-  }, [boardName, fetcher]);
+    return () => clearTimeout(handler)
+  }, [boardName, fetcher])
 
   const updateBoardName = useMutation(({ storage }, newBoardName: string) => {
-    storage.set("boardName", newBoardName);
-  }, []);
+    storage.set('boardName', newBoardName)
+  }, [])
 
   useEventListener(({ event }) => {
-    if (event.type === "board-deleted") {
+    if (event.type === 'board-deleted') {
       // Owner is the one who deleted the board
       // Additional toast message for Owner is annoying
-      if (userRole !== "Owner") {
-        toast("This board was deleted by its owner.", { type: "info" });
-        navigate("/boards");
+      if (userRole !== 'Owner') {
+        toast('This board was deleted by its owner.', { type: 'info' })
+        navigate('/boards')
       }
     }
-  });
+  })
 
-  const navigationPortal = document.getElementById(NAVIGATION_PORTAL_ID)!;
+  const navigationPortal = document.getElementById(NAVIGATION_PORTAL_ID)!
 
   function focusOnNewCardContent(cardId: string) {
     setTimeout(() => {
-      const newCardElement = document.getElementById(cardId)!;
+      const newCardElement = document.getElementById(cardId)!
       const editableSpan = newCardElement.querySelector(
-        "[contentEditable]"
-      ) as HTMLSpanElement;
-      editableSpan.focus();
-    }, 10);
+        '[contentEditable]'
+      ) as HTMLSpanElement
+      editableSpan.focus()
+    }, 10)
   }
 
   const createNewCard = useMutation(
     ({ storage }, event: MouseEvent<HTMLElement>) => {
-      const newId = v1();
+      const newId = v1()
 
       // Divide by two to center the card horizontally
-      const positionX = event.clientX - CARD_DIMENSIONS.width / 2;
+      const positionX = event.clientX - CARD_DIMENSIONS.width / 2
 
       // Subtract the height of the card to center it vertically
-      const positionY = event.clientY - CARD_DIMENSIONS.height;
+      const positionY = event.clientY - CARD_DIMENSIONS.height
 
       const newCard: CardType = {
         id: newId,
-        html: "",
+        html: '',
         positionX,
         positionY,
-      };
+      }
 
-      storage.get("cards").push(new LiveObject(newCard));
-      storage.get("zIndexOrderListWithCardIds").push(newId);
-      focusOnNewCardContent(newId);
+      storage.get('cards').push(new LiveObject(newCard))
+      storage.get('zIndexOrderListWithCardIds').push(newId)
+      focusOnNewCardContent(newId)
     },
     []
-  );
+  )
 
   return (
     <>
@@ -241,7 +241,7 @@ function Board() {
               x: Math.round(event.clientX),
               y: Math.round(event.clientY),
             },
-          });
+          })
         }}
         onPointerLeave={() =>
           updateMyPresence({
@@ -257,7 +257,7 @@ function Board() {
 
         {others.map(({ connectionId, presence }) => {
           if (presence.cursor === null) {
-            return null;
+            return null
           }
 
           return (
@@ -268,7 +268,7 @@ function Board() {
               y={presence.cursor.y}
               name={presence.name}
             />
-          );
+          )
         })}
       </main>
 
@@ -280,7 +280,7 @@ function Board() {
             className="portal-board-name-input"
             value={boardName}
             onChange={(event) => {
-              updateBoardName(event.target.value);
+              updateBoardName(event.target.value)
             }}
           />
           <Link
@@ -292,7 +292,7 @@ function Board() {
             <span>Share</span>
             <People />
           </Link>
-          {userRole === "Owner" && (
+          {userRole === 'Owner' && (
             <Link
               to={`/boards/${boardId}/delete`}
               prefetch="render"
@@ -309,48 +309,48 @@ function Board() {
 
       <Outlet />
     </>
-  );
+  )
 }
 
 const schema = z.object({
   boardName: z.string(),
-});
+})
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const userId = await requireAuthCookie(request);
+  const userId = await requireAuthCookie(request)
 
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema });
+  const formData = await request.formData()
+  const submission = parseWithZod(formData, { schema })
 
-  if (submission.status !== "success") {
-    return submission.reply();
+  if (submission.status !== 'success') {
+    return submission.reply()
   }
 
-  const boardId = params.id;
+  const boardId = params.id
 
-  invariant(boardId, "No board ID provided");
+  invariant(boardId, 'No board ID provided')
 
-  const { boardName } = submission.value;
+  const { boardName } = submission.value
 
   const isUserAllowedToEditBoard = await checkUserAllowedToEditBoard({
     userId,
     boardId,
-  });
+  })
 
   // If this ever happens, likely API request, because we currently only support editor role
   // No "Read only" role yet
   // Simply throw 403 authorization error
   if (!isUserAllowedToEditBoard) {
     return json(
-      { message: "You are not allowed to edit this board" },
+      { message: 'You are not allowed to edit this board' },
       { status: 403 }
-    );
+    )
   }
 
   await updateBoardName({
     newBoardName: boardName,
     boardId,
-  });
+  })
 
-  return submission.reply();
+  return submission.reply()
 }

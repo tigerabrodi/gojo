@@ -1,31 +1,31 @@
-import { prisma } from "~/db";
+import { prisma } from '~/db'
 
 export async function addNewBoardMember({
   email,
   boardId,
 }: {
-  email: string;
-  boardId: string;
+  email: string
+  boardId: string
 }) {
   const user = await prisma.user.findUnique({
     where: {
       email,
     },
-  });
+  })
 
   if (!user) {
-    return { success: false, message: "User not found." };
+    return { success: false, message: 'User not found.' }
   }
 
   await prisma.boardRole.create({
     data: {
-      role: "Editor",
+      role: 'Editor',
       userId: user.id,
       boardId,
     },
-  });
+  })
 
-  return { success: true, message: `User "${email}" added to board.` };
+  return { success: true, message: `User "${email}" added to board.` }
 }
 
 export async function getAllBoardRoles(boardId: string) {
@@ -37,9 +37,9 @@ export async function getAllBoardRoles(boardId: string) {
       user: true,
     },
     orderBy: {
-      addedAt: "asc",
+      addedAt: 'asc',
     },
-  });
+  })
 
   const boardRoles = result.map((boardRole) => {
     return {
@@ -48,10 +48,10 @@ export async function getAllBoardRoles(boardId: string) {
       role: boardRole.role,
       boardRoleId: boardRole.id,
       addedAt: boardRole.addedAt,
-    };
-  });
+    }
+  })
 
-  return boardRoles;
+  return boardRoles
 }
 
 export async function getBoardById(boardId: string) {
@@ -59,7 +59,7 @@ export async function getBoardById(boardId: string) {
     where: {
       id: boardId,
     },
-  });
+  })
 
-  return board;
+  return board
 }

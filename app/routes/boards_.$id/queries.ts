@@ -1,4 +1,4 @@
-import { prisma } from "~/db";
+import { prisma } from '~/db'
 
 export async function updateBoardLastOpenedAt(boardId: string) {
   await prisma.board.update({
@@ -8,15 +8,15 @@ export async function updateBoardLastOpenedAt(boardId: string) {
     data: {
       lastOpenedAt: new Date(),
     },
-  });
+  })
 }
 
 export async function updateBoardName({
   boardId,
   newBoardName,
 }: {
-  boardId: string;
-  newBoardName: string;
+  boardId: string
+  newBoardName: string
 }) {
   await prisma.board.update({
     where: {
@@ -25,15 +25,15 @@ export async function updateBoardName({
     data: {
       name: newBoardName,
     },
-  });
+  })
 }
 
 export async function upsertUserBoardRole({
   userId,
   boardId,
 }: {
-  userId: string;
-  boardId: string;
+  userId: string
+  boardId: string
 }) {
   await prisma.boardRole.upsert({
     where: {
@@ -46,7 +46,7 @@ export async function upsertUserBoardRole({
     create: {
       boardId,
       userId,
-      role: "Editor",
+      role: 'Editor',
     },
-  });
+  })
 }

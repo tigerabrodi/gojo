@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from 'react'
 
 export function Kakashi({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
@@ -561,5 +561,5 @@ export function Kakashi({ className, ...props }: SVGProps<SVGSVGElement>) {
         </clipPath>
       </defs>
     </svg>
-  );
+  )
 }

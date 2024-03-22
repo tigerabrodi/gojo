@@ -1,11 +1,11 @@
-import { prisma } from ".";
+import { prisma } from '.'
 
 export async function getUserFromDB(userId: string) {
   return await prisma.user.findUnique({
     where: {
       id: userId,
     },
-  });
+  })
 }
 
 export async function getUserRoleForBoard(userId: string, boardId: string) {
@@ -16,5 +16,5 @@ export async function getUserRoleForBoard(userId: string, boardId: string) {
         userId,
       },
     },
-  });
+  })
 }

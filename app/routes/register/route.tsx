@@ -1,35 +1,35 @@
-import { Form, useActionData, useNavigation } from "@remix-run/react";
-import { z } from "zod";
-import { parseWithZod } from "@conform-to/zod";
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
-import type { ActionFunctionArgs, LinksFunction } from "@vercel/remix";
-import { redirectIfLoggedInLoader, setAuthOnResponse } from "~/auth";
-import { createUser } from "./queries";
-import { checkUserExists } from "./validate";
-import authStyles from "~/styles/auth.css";
-import { FORM_INTENTS, INTENT } from "~/helpers";
-import { redirectWithSuccess } from "remix-toast";
+import { Form, useActionData, useNavigation } from '@remix-run/react'
+import { z } from 'zod'
+import { parseWithZod } from '@conform-to/zod'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import type { ActionFunctionArgs, LinksFunction } from '@vercel/remix'
+import { redirectIfLoggedInLoader, setAuthOnResponse } from '~/auth'
+import { createUser } from './queries'
+import { checkUserExists } from './validate'
+import authStyles from '~/styles/auth.css'
+import { FORM_INTENTS, INTENT } from '~/helpers'
+import { redirectWithSuccess } from 'remix-toast'
 
-export const loader = redirectIfLoggedInLoader;
+export const loader = redirectIfLoggedInLoader
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: authStyles },
-];
+  { rel: 'stylesheet', href: authStyles },
+]
 
 export default function Register() {
-  const lastResult = useActionData<typeof action>();
-  const navigation = useNavigation();
+  const lastResult = useActionData<typeof action>()
+  const navigation = useNavigation()
 
   const [form, fields] = useForm({
     lastResult: lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema });
+      return parseWithZod(formData, { schema })
     },
-    shouldValidate: "onSubmit",
-  });
+    shouldValidate: 'onSubmit',
+  })
 
   const isSubmitting =
-    navigation.formData?.get(INTENT) === FORM_INTENTS.register;
+    navigation.formData?.get(INTENT) === FORM_INTENTS.register
 
   return (
     <main>
@@ -45,7 +45,7 @@ export default function Register() {
           <div className="group">
             <label htmlFor={fields.name.id}>Name</label>
             <input
-              {...getInputProps(fields.name, { type: "text" })}
+              {...getInputProps(fields.name, { type: 'text' })}
               placeholder="John Kun"
             />
             {!fields.name.valid && (
@@ -56,7 +56,7 @@ export default function Register() {
           <div className="group">
             <label htmlFor={fields.email.id}>Email</label>
             <input
-              {...getInputProps(fields.email, { type: "email" })}
+              {...getInputProps(fields.email, { type: 'email' })}
               placeholder="johnkun@gmail.com"
             />
             {!fields.email.valid && (
@@ -74,7 +74,7 @@ export default function Register() {
               </span>
             </div>
             <input
-              {...getInputProps(fields.password, { type: "password" })}
+              {...getInputProps(fields.password, { type: 'password' })}
               placeholder="Password"
             />
             {!fields.password.valid && (
@@ -87,7 +87,7 @@ export default function Register() {
           <div className="group">
             <label htmlFor={fields.confirmPassword.id}>Confirm Password</label>
             <input
-              {...getInputProps(fields.confirmPassword, { type: "password" })}
+              {...getInputProps(fields.confirmPassword, { type: 'password' })}
             />
             {!fields.confirmPassword.valid && (
               <div className="error" id={fields.confirmPassword.errorId}>
@@ -106,58 +106,58 @@ export default function Register() {
         </button>
       </Form>
     </main>
-  );
+  )
 }
 
 const schema = z.object({
   name: z.string(),
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string().email({ message: 'Invalid email address' }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
+    .min(6, { message: 'Password must be at least 6 characters' }),
   confirmPassword: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
+    .min(6, { message: 'Password must be at least 6 characters' }),
+})
 
 export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema });
+  const formData = await request.formData()
+  const submission = parseWithZod(formData, { schema })
 
-  if (submission.status !== "success") {
-    return submission.reply();
+  if (submission.status !== 'success') {
+    return submission.reply()
   }
 
-  const { email, password, name, confirmPassword } = submission.value;
+  const { email, password, name, confirmPassword } = submission.value
 
   if (password !== confirmPassword) {
     return submission.reply({
       fieldErrors: {
-        confirmPassword: ["Passwords do not match."],
+        confirmPassword: ['Passwords do not match.'],
       },
-    });
+    })
   }
 
-  const userExists = await checkUserExists(email);
+  const userExists = await checkUserExists(email)
 
   if (userExists) {
     return submission.reply({
       fieldErrors: {
-        email: ["User with this email already exists."],
+        email: ['User with this email already exists.'],
       },
-    });
+    })
   }
 
   let user = await createUser({
     email,
     password,
     name,
-  });
+  })
 
   return setAuthOnResponse(
-    await redirectWithSuccess("/boards", {
-      message: "Successfully created a user.",
+    await redirectWithSuccess('/boards', {
+      message: 'Successfully created a user.',
     }),
     user.id
-  );
+  )
 }

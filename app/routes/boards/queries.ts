@@ -1,28 +1,28 @@
-import { prisma } from "~/db";
+import { prisma } from '~/db'
 
 export async function createBoard(
   userId: string,
-  boardName: string = "Untitled"
+  boardName: string = 'Untitled'
 ) {
   const board = await prisma.board.create({
     data: {
       name: boardName,
     },
-  });
+  })
 
   if (!board) {
-    throw new Error("Failed to create board");
+    throw new Error('Failed to create board')
   }
 
   await prisma.boardRole.create({
     data: {
-      role: "Owner",
+      role: 'Owner',
       boardId: board.id,
       userId: userId,
     },
-  });
+  })
 
-  return board;
+  return board
 }
 
 export async function getBoardsForUser(userId: string) {
@@ -33,10 +33,10 @@ export async function getBoardsForUser(userId: string) {
     include: {
       board: true,
     },
-  });
+  })
 
   return result.map(({ board }) => ({
     ...board,
     lastOpenedAt: board.lastOpenedAt?.toLocaleDateString() ?? null,
-  }));
+  }))
 }

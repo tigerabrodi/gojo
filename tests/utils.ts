@@ -1,14 +1,14 @@
-import { faker } from "@faker-js/faker";
-import crypto from "crypto";
-import { prisma } from "~/db";
+import { faker } from '@faker-js/faker'
+import crypto from 'crypto'
+import { prisma } from '~/db'
 
 export function createRandomUser() {
-  const username = faker.internet.userName();
+  const username = faker.internet.userName()
   return {
     email: `test_${username}@example.com`,
     password: faker.internet.password(),
     name: username,
-  };
+  }
 }
 
 export function createRandomBoard() {
@@ -24,7 +24,7 @@ export function createRandomBoard() {
       seventhCardContent: faker.lorem.words(2),
       eighthCardContent: faker.lorem.words(2),
     },
-  };
+  }
 }
 
 export async function createAccount({
@@ -32,14 +32,14 @@ export async function createAccount({
   password,
   name,
 }: {
-  email: string;
-  password: string;
-  name: string;
+  email: string
+  password: string
+  name: string
 }) {
-  let salt = crypto.randomBytes(16).toString("hex");
+  let salt = crypto.randomBytes(16).toString('hex')
   let hash = crypto
-    .pbkdf2Sync(password, salt, 1000, 64, "sha256")
-    .toString("hex");
+    .pbkdf2Sync(password, salt, 1000, 64, 'sha256')
+    .toString('hex')
 
   return prisma.user.create({
     data: {
@@ -52,10 +52,10 @@ export async function createAccount({
         },
       },
     },
-  });
+  })
 }
 
-export const user1File = "playwright/.auth/user1.json";
-export const user2File = "playwright/.auth/user2.json";
-export const user1Details = "playwright/.auth/user1-details.json";
-export const user2Details = "playwright/.auth/user2-details.json";
+export const user1File = 'playwright/.auth/user1.json'
+export const user2File = 'playwright/.auth/user2.json'
+export const user1Details = 'playwright/.auth/user1-details.json'
+export const user2Details = 'playwright/.auth/user2-details.json'

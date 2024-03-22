@@ -1,32 +1,32 @@
-import { Form, Link, useLoaderData, useNavigation } from "@remix-run/react";
-import { FORM_INTENTS, INTENT } from "~/helpers";
-import { Plus } from "~/icons";
+import { Form, Link, useLoaderData, useNavigation } from '@remix-run/react'
+import { FORM_INTENTS, INTENT } from '~/helpers'
+import { Plus } from '~/icons'
 
-import styles from "./styles.css";
-import { redirect, json } from "@vercel/remix";
-import type { LoaderFunctionArgs, LinksFunction } from "@vercel/remix";
-import { requireAuthCookie } from "~/auth";
-import { createBoard, getBoardsForUser } from "./queries";
+import styles from './styles.css'
+import { redirect, json } from '@vercel/remix'
+import type { LoaderFunctionArgs, LinksFunction } from '@vercel/remix'
+import { requireAuthCookie } from '~/auth'
+import { createBoard, getBoardsForUser } from './queries'
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const userId = await requireAuthCookie(request);
+  const userId = await requireAuthCookie(request)
 
-  const boards = await getBoardsForUser(userId);
+  const boards = await getBoardsForUser(userId)
 
   return json({
     boards,
-  });
+  })
 }
 
 export default function Boards() {
-  const { boards } = useLoaderData<typeof loader>();
+  const { boards } = useLoaderData<typeof loader>()
 
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   const isSubmitting =
-    navigation.formData?.get(INTENT) === FORM_INTENTS.createBoard;
+    navigation.formData?.get(INTENT) === FORM_INTENTS.createBoard
 
   return (
     <main>
@@ -38,11 +38,11 @@ export default function Boards() {
               <Link
                 to={`/boards/${board.id}`}
                 prefetch="render"
-                aria-label={board.name || "Untitled board"}
+                aria-label={board.name || 'Untitled board'}
               >
-                <span className="name">{board.name || "Untitled"}</span>
+                <span className="name">{board.name || 'Untitled'}</span>
                 <span className="date">
-                  Last opened: {board.lastOpenedAt ?? "Not yet"}
+                  Last opened: {board.lastOpenedAt ?? 'Not yet'}
                 </span>
               </Link>
             </li>
@@ -61,13 +61,13 @@ export default function Boards() {
         </button>
       </Form>
     </main>
-  );
+  )
 }
 
 export async function action({ request }: { request: Request }) {
-  const userId = await requireAuthCookie(request);
+  const userId = await requireAuthCookie(request)
 
-  const board = await createBoard(userId);
+  const board = await createBoard(userId)
 
-  return redirect(`/boards/${board.id}`);
+  return redirect(`/boards/${board.id}`)
 }

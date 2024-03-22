@@ -1,89 +1,89 @@
-import { useEffect, useRef, useState } from "react";
-import { useMyPresence, useOthers, useStorage } from "~/liveblocks.config";
-import type { CardType } from "~/helpers";
-import styles from "./Card.css";
-import type { LinksFunction } from "@vercel/remix";
-import { moveCursorToEnd } from "./utils";
-import * as Toolbar from "@radix-ui/react-toolbar";
-import { Trash } from "~/icons";
-import { formatOrdinals, getColorWithId } from "~/helpers/functions";
-import DOMPurify from "dompurify";
-import { useGetCardLiveblocksQueries } from "./liveblocks-queries";
+import { useEffect, useRef, useState } from 'react'
+import { useMyPresence, useOthers, useStorage } from '~/liveblocks.config'
+import type { CardType } from '~/helpers'
+import styles from './Card.css'
+import type { LinksFunction } from '@vercel/remix'
+import { moveCursorToEnd } from './utils'
+import * as Toolbar from '@radix-ui/react-toolbar'
+import { Trash } from '~/icons'
+import { formatOrdinals, getColorWithId } from '~/helpers/functions'
+import DOMPurify from 'dompurify'
+import { useGetCardLiveblocksQueries } from './liveblocks-queries'
 
 export const CARD_DIMENSIONS = {
   width: 200,
   height: 200,
-} as const;
+} as const
 
 const ARROW_KEYS = {
-  ArrowUp: "ArrowUp",
-  ArrowDown: "ArrowDown",
-  ArrowLeft: "ArrowLeft",
-  ArrowRight: "ArrowRight",
-} as const;
+  ArrowUp: 'ArrowUp',
+  ArrowDown: 'ArrowDown',
+  ArrowLeft: 'ArrowLeft',
+  ArrowRight: 'ArrowRight',
+} as const
 
 export const cardLinks: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
-];
+  { rel: 'stylesheet', href: styles },
+]
 
 export function Card({ card, index }: { card: CardType; index: number }) {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false)
 
   // Needed to calculate the distance between the cursor and the card's top-left corner
   // Otherwise, the card would jump to the cursor's position when dragging
   // This would be a bad user experience
   // Hence needed to maintain relative position between the cursor and the card
-  const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
+  const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 })
 
   // Needed to properly move cursor to the end of the contentEditable span
-  const [content, setContent] = useState(card.html);
+  const [content, setContent] = useState(card.html)
 
   // Needed to change the cursor to text when the card content is focused
-  const [isCardContentFocused, setIsCardContentFocused] = useState(false);
+  const [isCardContentFocused, setIsCardContentFocused] = useState(false)
 
   // Needed to prevent focusing card content when card clicked first time
   const [hasCardBeenClickedBefore, setHasCardBeenClickedBefore] =
-    useState(false);
+    useState(false)
 
-  const cardContentRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLButtonElement>(null);
+  const cardContentRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLButtonElement>(null)
 
-  const [, updateMyPresence] = useMyPresence();
-  const others = useOthers();
+  const [, updateMyPresence] = useMyPresence()
+  const others = useOthers()
   const personFocusingOnThisCard = others.find(
     (person) => person.presence.selectedCardId === card.id
-  );
+  )
 
   const zIndexOrderListWithCardIds = useStorage(
     (root) => root.zIndexOrderListWithCardIds
-  );
-  const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id);
+  )
+  const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id)
 
   const { bringCardToFront, onDelete, updateCardPosition, updateCardContent } =
-    useGetCardLiveblocksQueries();
+    useGetCardLiveblocksQueries()
 
   useEffect(() => {
     if (isDragging) {
       function handleGlobalMouseMove(event: MouseEvent) {
-        if (!isDragging) return;
-        const newX = event.clientX - dragStartOffset.x;
-        const newY = event.clientY - dragStartOffset.y;
-        updateCardPosition(card.id, newX, newY);
+        if (!isDragging) return
+        const newX = event.clientX - dragStartOffset.x
+        const newY = event.clientY - dragStartOffset.y
+        updateCardPosition(card.id, newX, newY)
       }
 
       function handleGlobalMouseUp() {
-        setIsDragging(false);
-        window.removeEventListener("mousemove", handleGlobalMouseMove);
-        window.removeEventListener("mouseup", handleGlobalMouseUp);
+        setIsDragging(false)
+        window.removeEventListener('mousemove', handleGlobalMouseMove)
+        window.removeEventListener('mouseup', handleGlobalMouseUp)
       }
 
-      window.addEventListener("mousemove", handleGlobalMouseMove);
-      window.addEventListener("mouseup", handleGlobalMouseUp);
+      window.addEventListener('mousemove', handleGlobalMouseMove)
+      window.addEventListener('mouseup', handleGlobalMouseUp)
 
       return () => {
-        window.removeEventListener("mousemove", handleGlobalMouseMove);
-        window.removeEventListener("mouseup", handleGlobalMouseUp);
-      };
+        window.removeEventListener('mousemove', handleGlobalMouseMove)
+        window.removeEventListener('mouseup', handleGlobalMouseUp)
+      }
     }
   }, [
     card.id,
@@ -91,37 +91,37 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     dragStartOffset.x,
     dragStartOffset.y,
     updateCardPosition,
-  ]);
+  ])
 
   function handleMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
     const isUserEditingCardContent =
-      document.activeElement === cardContentRef.current;
+      document.activeElement === cardContentRef.current
     if (isUserEditingCardContent) {
-      return;
+      return
     }
 
-    const startX = event.clientX;
-    const startY = event.clientY;
+    const startX = event.clientX
+    const startY = event.clientY
 
-    setIsDragging(true);
+    setIsDragging(true)
 
     setDragStartOffset({
       x: startX - card.positionX,
       y: startY - card.positionY,
-    });
+    })
 
     // Needed to prevent focusing card content when dragging
-    event.preventDefault();
+    event.preventDefault()
 
     // In turn, we have to focus on the card itself manually
-    cardRef.current?.focus();
+    cardRef.current?.focus()
   }
 
   function handleInput(event: React.FormEvent<HTMLSpanElement>) {
-    const newHtml = event.currentTarget.innerHTML || "";
-    const purifiedHtml = DOMPurify.sanitize(newHtml);
-    setContent(purifiedHtml);
-    updateCardContent(card.id, purifiedHtml);
+    const newHtml = event.currentTarget.innerHTML || ''
+    const purifiedHtml = DOMPurify.sanitize(newHtml)
+    setContent(purifiedHtml)
+    updateCardContent(card.id, purifiedHtml)
   }
 
   // Move the cursor to the end of the contentEditable span when the content changes
@@ -130,123 +130,123 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       cardContentRef.current &&
       document.activeElement === cardContentRef.current
     ) {
-      moveCursorToEnd(cardContentRef.current);
+      moveCursorToEnd(cardContentRef.current)
     }
-  }, [content]);
+  }, [content])
 
   function onCardBlur(event: React.FocusEvent<HTMLButtonElement>) {
     const isUserFocusingOnCardContent =
-      event.relatedTarget === cardContentRef.current;
-    if (isUserFocusingOnCardContent) return;
+      event.relatedTarget === cardContentRef.current
+    if (isUserFocusingOnCardContent) return
 
-    cardContentRef.current?.blur();
-    setIsCardContentFocused(false);
-    setHasCardBeenClickedBefore(false);
-    updateMyPresence({ isTyping: false, selectedCardId: null });
+    cardContentRef.current?.blur()
+    setIsCardContentFocused(false)
+    setHasCardBeenClickedBefore(false)
+    updateMyPresence({ isTyping: false, selectedCardId: null })
   }
 
-  function handleCardMove(direction: "up" | "down" | "left" | "right") {
-    let newX = card.positionX;
-    let newY = card.positionY;
+  function handleCardMove(direction: 'up' | 'down' | 'left' | 'right') {
+    let newX = card.positionX
+    let newY = card.positionY
 
     switch (direction) {
-      case "up":
-        newY -= 10;
-        break;
-      case "down":
-        newY += 10;
-        break;
-      case "left":
-        newX -= 10;
-        break;
-      case "right":
-        newX += 10;
-        break;
+      case 'up':
+        newY -= 10
+        break
+      case 'down':
+        newY += 10
+        break
+      case 'left':
+        newX -= 10
+        break
+      case 'right':
+        newX += 10
+        break
       default:
-        break;
+        break
     }
 
-    updateCardPosition(card.id, newX, newY);
+    updateCardPosition(card.id, newX, newY)
   }
 
   function onCardKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
-    if (event.key === "Escape" && cardContentRef.current) {
-      cardContentRef.current.blur();
-      return;
+    if (event.key === 'Escape' && cardContentRef.current) {
+      cardContentRef.current.blur()
+      return
     }
 
     const isUserEditingCardContent =
-      cardContentRef.current === document.activeElement;
-    if (isUserEditingCardContent) return;
+      cardContentRef.current === document.activeElement
+    if (isUserEditingCardContent) return
 
-    const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
+    const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS]
 
     if (arrowKey) {
       switch (event.key) {
-        case "ArrowUp":
-          handleCardMove("up");
-          break;
-        case "ArrowDown":
-          handleCardMove("down");
-          break;
-        case "ArrowLeft":
-          handleCardMove("left");
-          break;
-        case "ArrowRight":
-          handleCardMove("right");
-          break;
+        case 'ArrowUp':
+          handleCardMove('up')
+          break
+        case 'ArrowDown':
+          handleCardMove('down')
+          break
+        case 'ArrowLeft':
+          handleCardMove('left')
+          break
+        case 'ArrowRight':
+          handleCardMove('right')
+          break
         default:
-          break;
+          break
       }
 
       // Prevent the page from scrolling when using arrow keys
-      event.preventDefault();
+      event.preventDefault()
     }
   }
 
   function scrollToTheBottomOfCardContent() {
     if (cardContentRef.current) {
-      cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
+      cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight
     }
   }
 
   const isSomeoneElseTypingOnThisCard =
     personFocusingOnThisCard &&
     personFocusingOnThisCard.presence.selectedCardId === card.id &&
-    personFocusingOnThisCard.presence.isTyping;
+    personFocusingOnThisCard.presence.isTyping
 
   useEffect(() => {
     if (isSomeoneElseTypingOnThisCard) {
-      scrollToTheBottomOfCardContent();
+      scrollToTheBottomOfCardContent()
     }
-  }, [isSomeoneElseTypingOnThisCard]);
+  }, [isSomeoneElseTypingOnThisCard])
 
   function onCardClick() {
     const isCardContentCurrentlyFocused =
-      document.activeElement === cardContentRef.current;
+      document.activeElement === cardContentRef.current
 
-    if (isCardContentCurrentlyFocused) return;
+    if (isCardContentCurrentlyFocused) return
 
     if (!hasCardBeenClickedBefore) {
-      setHasCardBeenClickedBefore(true);
-      return;
+      setHasCardBeenClickedBefore(true)
+      return
     }
 
     if (cardContentRef.current) {
-      cardContentRef.current.focus();
-      moveCursorToEnd(cardContentRef.current);
-      setIsCardContentFocused(true);
-      scrollToTheBottomOfCardContent();
-      updateMyPresence({ isTyping: true });
+      cardContentRef.current.focus()
+      moveCursorToEnd(cardContentRef.current)
+      setIsCardContentFocused(true)
+      scrollToTheBottomOfCardContent()
+      updateMyPresence({ isTyping: true })
     }
   }
 
   function onCardFocus() {
-    bringCardToFront(card.id);
+    bringCardToFront(card.id)
 
     updateMyPresence({
       selectedCardId: card.id,
-    });
+    })
   }
 
   return (
@@ -262,7 +262,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       onClick={onCardClick}
       onDoubleClick={(event) => {
         // Needed to prevent card from being created when double clicking
-        event.stopPropagation();
+        event.stopPropagation()
       }}
       style={{
         top: card.positionY,
@@ -301,7 +301,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         onInput={handleInput}
         className="card-content"
         style={{
-          cursor: isCardContentFocused ? "text" : "default",
+          cursor: isCardContentFocused ? 'text' : 'default',
         }}
         dangerouslySetInnerHTML={{
           __html: card.html,
@@ -317,5 +317,5 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         </Toolbar.Button>
       </Toolbar.Root>
     </button>
-  );
+  )
 }

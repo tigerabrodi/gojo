@@ -1,16 +1,16 @@
-import type { LinksFunction } from "@vercel/remix";
-import navigationStyles from "./Navigation.css";
-import { Kakashi } from "~/icons";
-import { Link, useLocation } from "@remix-run/react";
+import type { LinksFunction } from '@vercel/remix'
+import navigationStyles from './Navigation.css'
+import { Kakashi } from '~/icons'
+import { Link, useLocation } from '@remix-run/react'
 
-export const NAVIGATION_PORTAL_ID = "navigation-portal";
+export const NAVIGATION_PORTAL_ID = 'navigation-portal'
 
 export const navigationLinks: LinksFunction = () => [
-  { rel: "stylesheet", href: navigationStyles },
-];
+  { rel: 'stylesheet', href: navigationStyles },
+]
 
 export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const location = useLocation();
+  const location = useLocation()
 
   return (
     <nav>
@@ -32,19 +32,19 @@ export function Navigation({ isAuthenticated }: { isAuthenticated: boolean }) {
           <Link
             to="/login"
             prefetch="render"
-            className={location.pathname === "/login" ? "active" : ""}
+            className={location.pathname === '/login' ? 'active' : ''}
           >
             Login
           </Link>
           <Link
             to="/register"
             prefetch="render"
-            className={location.pathname === "/register" ? "active" : ""}
+            className={location.pathname === '/register' ? 'active' : ''}
           >
             Register
           </Link>
         </div>
       )}
     </nav>
-  );
+  )
 }
