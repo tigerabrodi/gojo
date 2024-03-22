@@ -128,8 +128,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }, [content]);
 
   function onCardBlur(event: React.FocusEvent<HTMLButtonElement>) {
-    // If we're focusing on card content, card's blur should not be triggered
-    if (event.relatedTarget === cardContentRef.current) return;
+    const isUserFocusingOnCardContent =
+      event.relatedTarget === cardContentRef.current;
+    if (isUserFocusingOnCardContent) return;
 
     cardContentRef.current?.blur();
     setIsCardContentFocused(false);
@@ -167,8 +168,9 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       return;
     }
 
-    // If user editing text, moving card with arrow keys should not be triggered
-    if (cardContentRef.current === document.activeElement) return;
+    const isUserEditingCardContent =
+      cardContentRef.current === document.activeElement;
+    if (isUserEditingCardContent) return;
 
     const arrowKey = ARROW_KEYS[event.key as keyof typeof ARROW_KEYS];
 
@@ -197,7 +199,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
   function scrollToTheBottomOfCardContent() {
     if (cardContentRef.current) {
-      // Scroll to the bottom of the contentEditable span
       cardContentRef.current.scrollTop = cardContentRef.current.scrollHeight;
     }
   }
