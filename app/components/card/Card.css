@@ -52,6 +52,7 @@
     width: 100%;
     padding: 4px;
     line-height: 1.25;
+    text-align: left;
 
     scrollbar-width: thin;
     scrollbar-color: var(--colors-primary-700);

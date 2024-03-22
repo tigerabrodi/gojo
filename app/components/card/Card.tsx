@@ -41,7 +41,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     useState(false);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLButtonElement>(null);
 
   const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
@@ -88,7 +88,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardPosition,
   ]);
 
-  function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+  function handleMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
     if (document.activeElement === cardContentRef.current) {
       return;
     }
@@ -127,7 +127,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     }
   }, [content]);
 
-  function onCardBlur(event: React.FocusEvent<HTMLDivElement>) {
+  function onCardBlur(event: React.FocusEvent<HTMLButtonElement>) {
     // If we're focusing on card content, card's blur should not be triggered
     if (event.relatedTarget === cardContentRef.current) return;
 
@@ -161,7 +161,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     updateCardPosition(card.id, newX, newY);
   }
 
-  function onCardKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function onCardKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
     if (event.key === "Escape" && cardContentRef.current) {
       cardContentRef.current.blur();
       return;
@@ -242,9 +242,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   }
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
       className="card"
       ref={cardRef}
       id={card.id}
@@ -310,6 +308,6 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
-    </div>
+    </button>
   );
 }
