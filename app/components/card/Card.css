@@ -29,6 +29,12 @@
     }
   }
 
+  .resize-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+  }
+
   .card-presence-name {
     position: absolute;
     top: 0;

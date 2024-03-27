@@ -62,12 +62,16 @@ export function Card({ card, index }: { card: CardType; index: number }) {
   )
   const cardZIndex = zIndexOrderListWithCardIds.indexOf(card.id)
 
-  const { bringCardToFront, onDelete, updateCardPosition, updateCardContent } =
-    useGetCardLiveblocksQueries()
+  const {
+    bringCardToFront,
+    onDelete,
+    updateCardPosition,
+    updateCardContent,
+    updateCardSize,
+  } = useGetCardLiveblocksQueries()
 
   useEffect(() => {
     function handleGlobalMouseMove(event: MouseEvent) {
-      if (!isDragging) return
       const newX = event.clientX - dragStartOffset.x
       const newY = event.clientY - dragStartOffset.y
       updateCardPosition(card.id, newX, newY)
@@ -252,6 +256,70 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     })
   }
 
+  function handleResizeMouseDown(
+    resizeHandlerMoustDownEvent: React.MouseEvent<HTMLDivElement>,
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  ) {
+    resizeHandlerMoustDownEvent.stopPropagation()
+
+    const startWidth = card.width
+    const startHeight = card.height
+
+    const startX = resizeHandlerMoustDownEvent.clientX
+    const startY = resizeHandlerMoustDownEvent.clientY
+
+    const startPosX = card.positionX
+    const startPosY = card.positionY
+
+    function handleMouseMove(mouseMoveEvent: MouseEvent) {
+      let newWidth = startWidth
+      let newHeight = startHeight
+      let newX = startPosX
+      let newY = startPosY
+
+      const widthDiff = mouseMoveEvent.clientX - startX
+      const heightDiff = mouseMoveEvent.clientY - startY
+
+      switch (corner) {
+        case 'top-left':
+          newWidth = Math.max(150, startWidth - widthDiff)
+          newHeight = Math.max(150, startHeight - heightDiff)
+
+          newX = startPosX + (startWidth - newWidth)
+          newY = startPosY + (startHeight - newHeight)
+          break
+
+        case 'top-right':
+          newWidth = Math.max(150, startWidth + widthDiff)
+          newHeight = Math.max(150, startHeight - heightDiff)
+
+          newY = startPosY + (startHeight - newHeight)
+          break
+        case 'bottom-left':
+          newWidth = Math.max(150, startWidth - widthDiff)
+          newHeight = Math.max(150, startHeight + heightDiff)
+
+          newX = startPosX + (startWidth - newWidth)
+          break
+        case 'bottom-right':
+          newWidth = Math.max(150, startWidth + widthDiff)
+          newHeight = Math.max(150, startHeight + heightDiff)
+          break
+      }
+
+      updateCardSize(card.id, newWidth, newHeight)
+      updateCardPosition(card.id, newX, newY)
+    }
+
+    function handleMouseUp() {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+  }
+
   return (
     <div
       role="button"
@@ -272,8 +340,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       style={{
         top: card.positionY,
         left: card.positionX,
-        width: CARD_DIMENSIONS.width,
-        height: CARD_DIMENSIONS.height,
+        width: card.width,
+        height: card.height,
         zIndex: cardZIndex,
         ...(personFocusingOnThisCard
           ? {
@@ -321,6 +389,28 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           <Trash />
         </Toolbar.Button>
       </Toolbar.Root>
+
+      <div
+        className="resize-handle"
+        onMouseDown={(event) => handleResizeMouseDown(event, 'top-left')}
+        style={{ left: '-20px', top: '-20px', cursor: 'nwse-resize' }}
+      />
+
+      <div
+        className="resize-handle"
+        onMouseDown={(event) => handleResizeMouseDown(event, 'top-right')}
+        style={{ right: '-20px', top: '-20px', cursor: 'nesw-resize' }}
+      />
+      <div
+        className="resize-handle"
+        onMouseDown={(event) => handleResizeMouseDown(event, 'bottom-left')}
+        style={{ bottom: '-20px', left: '-20px', cursor: 'nesw-resize' }}
+      />
+      <div
+        className="resize-handle"
+        onMouseDown={(event) => handleResizeMouseDown(event, 'bottom-right')}
+        style={{ bottom: '-20px', right: '-20px', cursor: 'nwse-resize' }}
+      />
     </div>
   )
 }

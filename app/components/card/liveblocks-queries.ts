@@ -40,10 +40,22 @@ export function useGetCardLiveblocksQueries() {
     []
   )
 
+  const updateCardSize = useMutation(
+    ({ storage }, id: string, width: number, height: number) => {
+      const card = storage.get('cards').find((card) => card.get('id') === id)
+      if (card) {
+        card.set('width', width)
+        card.set('height', height)
+      }
+    },
+    []
+  )
+
   return {
     updateCardPosition,
     onDelete,
     bringCardToFront,
     updateCardContent,
+    updateCardSize,
   }
 }

@@ -225,6 +225,8 @@ function Board() {
         html: '',
         positionX,
         positionY,
+        height: CARD_DIMENSIONS.height,
+        width: CARD_DIMENSIONS.width,
       }
 
       storage.get('cards').push(new LiveObject(newCard))
