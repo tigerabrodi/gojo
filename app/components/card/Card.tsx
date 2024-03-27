@@ -281,30 +281,51 @@ export function Card({ card, index }: { card: CardType; index: number }) {
       const heightDiff = mouseMoveEvent.clientY - startY
 
       switch (corner) {
-        case 'top-left':
+        case 'top-left': {
           newWidth = Math.max(150, startWidth - widthDiff)
           newHeight = Math.max(150, startHeight - heightDiff)
 
-          newX = startPosX + (startWidth - newWidth)
-          newY = startPosY + (startHeight - newHeight)
-          break
+          const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+          newWidth = maxNewWidthAndHeight
+          newHeight = maxNewWidthAndHeight
 
-        case 'top-right':
+          newX = startPosX + (startWidth - maxNewWidthAndHeight)
+          newY = startPosY + (startHeight - maxNewWidthAndHeight)
+          break
+        }
+
+        case 'top-right': {
           newWidth = Math.max(150, startWidth + widthDiff)
           newHeight = Math.max(150, startHeight - heightDiff)
 
-          newY = startPosY + (startHeight - newHeight)
+          const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+          newWidth = maxNewWidthAndHeight
+          newHeight = maxNewWidthAndHeight
+
+          newY = startPosY + (startHeight - maxNewWidthAndHeight)
           break
-        case 'bottom-left':
+        }
+        case 'bottom-left': {
           newWidth = Math.max(150, startWidth - widthDiff)
           newHeight = Math.max(150, startHeight + heightDiff)
 
-          newX = startPosX + (startWidth - newWidth)
+          const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+          newWidth = maxNewWidthAndHeight
+          newHeight = maxNewWidthAndHeight
+
+          newX = startPosX + (startWidth - maxNewWidthAndHeight)
           break
-        case 'bottom-right':
+        }
+        case 'bottom-right': {
           newWidth = Math.max(150, startWidth + widthDiff)
           newHeight = Math.max(150, startHeight + heightDiff)
+
+          const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+          newWidth = maxNewWidthAndHeight
+          newHeight = maxNewWidthAndHeight
+
           break
+        }
       }
 
       updateCardSize(card.id, newWidth, newHeight)
