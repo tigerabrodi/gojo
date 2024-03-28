@@ -260,6 +260,7 @@ export function Card({ card, index }: { card: CardType; index: number }) {
     resizeHandlerMoustDownEvent: React.MouseEvent<HTMLDivElement>,
     corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   ) {
+    // Needed to prevent card from being dragged when resizing
     resizeHandlerMoustDownEvent.stopPropagation()
 
     const startWidth = card.width
