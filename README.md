@@ -437,6 +437,26 @@ function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
 
 </details>
 
+<details>
+  <summary>🍿 Card's content</summary>
+
+---
+
+For the content, we're using a contenteditable div. We're storing the actual HTML content because we want to preserve the formatting.
+
+I'm using DOMPurify to sanitize the HTML content before saving it to the database. This ensures that we're not saving any malicious code.
+
+```tsx
+function handleInput(event: React.FormEvent<HTMLSpanElement>) {
+  const newHtml = event.currentTarget.innerHTML || ''
+  const purifiedHtml = DOMPurify.sanitize(newHtml)
+  setContent(purifiedHtml)
+  updateCardContent(card.id, purifiedHtml)
+}
+```
+
+</details>
+
 # Liveblocks
 
 Liveblocks is the service I used for the real-time collab stuff.
