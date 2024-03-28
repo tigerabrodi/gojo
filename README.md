@@ -457,6 +457,340 @@ function handleInput(event: React.FormEvent<HTMLSpanElement>) {
 
 </details>
 
+<details>
+  <summary>🍿 Resizing the card</summary>
+
+---
+
+This was a bit of an adventure. I first needed to figure out how to make the card resizable, then figure out how to preserve the aspect ratio while resizing.
+
+To take you through this, let me first show you the entire code, and then we'll break it down.
+
+```tsx
+function handleResizeMouseDown(
+  resizeHandlerMoustDownEvent: React.MouseEvent<HTMLDivElement>,
+  corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+) {
+  // Needed to prevent card from being dragged when resizing
+  resizeHandlerMoustDownEvent.stopPropagation()
+
+  const startWidth = card.width
+  const startHeight = card.height
+
+  const startX = resizeHandlerMoustDownEvent.clientX
+  const startY = resizeHandlerMoustDownEvent.clientY
+
+  const startPosX = card.positionX
+  const startPosY = card.positionY
+
+  function handleMouseMove(mouseMoveEvent: MouseEvent) {
+    let newWidth = startWidth
+    let newHeight = startHeight
+    let newX = startPosX
+    let newY = startPosY
+
+    const widthDiff = mouseMoveEvent.clientX - startX
+    const heightDiff = mouseMoveEvent.clientY - startY
+
+    switch (corner) {
+      case 'top-left': {
+        newWidth = Math.max(CARD_DIMENSIONS.width, startWidth - widthDiff)
+        newHeight = Math.max(CARD_DIMENSIONS.height, startHeight - heightDiff)
+
+        const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+        newWidth = maxNewWidthAndHeight
+        newHeight = maxNewWidthAndHeight
+
+        newX = startPosX + (startWidth - maxNewWidthAndHeight)
+        newY = startPosY + (startHeight - maxNewWidthAndHeight)
+        break
+      }
+
+      case 'top-right': {
+        newWidth = Math.max(CARD_DIMENSIONS.width, startWidth + widthDiff)
+        newHeight = Math.max(CARD_DIMENSIONS.height, startHeight - heightDiff)
+
+        const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+        newWidth = maxNewWidthAndHeight
+        newHeight = maxNewWidthAndHeight
+
+        newY = startPosY + (startHeight - maxNewWidthAndHeight)
+        break
+      }
+      case 'bottom-left': {
+        newWidth = Math.max(CARD_DIMENSIONS.width, startWidth - widthDiff)
+        newHeight = Math.max(CARD_DIMENSIONS.height, startHeight + heightDiff)
+
+        const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+        newWidth = maxNewWidthAndHeight
+        newHeight = maxNewWidthAndHeight
+
+        newX = startPosX + (startWidth - maxNewWidthAndHeight)
+        break
+      }
+      case 'bottom-right': {
+        newWidth = Math.max(CARD_DIMENSIONS.width, startWidth + widthDiff)
+        newHeight = Math.max(CARD_DIMENSIONS.height, startHeight + heightDiff)
+
+        const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+        newWidth = maxNewWidthAndHeight
+        newHeight = maxNewWidthAndHeight
+
+        break
+      }
+    }
+
+    updateCardSize(card.id, newWidth, newHeight)
+    updateCardPosition(card.id, newX, newY)
+  }
+
+  function handleMouseUp() {
+    window.removeEventListener('mousemove', handleMouseMove)
+    window.removeEventListener('mouseup', handleMouseUp)
+  }
+
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mouseup', handleMouseUp)
+}
+```
+
+Let's now try to break it down and understand what's happening.
+
+I think we can start by focusing on everything besides `handleMouseMove`. For now, we assume `handleMouseMove` is just a black box that does some magic resizing.
+
+```tsx
+function handleResizeMouseDown(
+  resizeHandlerMoustDownEvent: React.MouseEvent<HTMLDivElement>,
+  corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+) {
+  // Needed to prevent card from being dragged when resizing
+  resizeHandlerMoustDownEvent.stopPropagation()
+
+  // Width and height of the card when resizing starts
+  const startWidth = card.width
+  const startHeight = card.height
+
+  // Starting position of the mouse when resizing starts
+  // This will be one of the corners of the card aka the resize handlers
+  const startX = resizeHandlerMoustDownEvent.clientX
+  const startY = resizeHandlerMoustDownEvent.clientY
+
+  // This represents the starting position of the card
+  // The coordinates of the top left corner of the card
+  const startPosX = card.positionX
+  const startPosY = card.positionY
+
+  function handleMouseMove(mouseMoveEvent: MouseEvent) {
+    // ...
+  }
+
+  // When done resizing, remove the event listeners
+  // If we don't do this, the card will keep resizing even after we let go of the mouse button
+  function handleMouseUp() {
+    window.removeEventListener('mousemove', handleMouseMove)
+    window.removeEventListener('mouseup', handleMouseUp)
+  }
+
+  // Add event listeners for mouse move and mouse up
+  // As you can see, we only do this when resizing starts
+  // aka in our `handleResizeMouseDown` function
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mouseup', handleMouseUp)
+}
+```
+
+Now, with that out of the way, let's focus on `handleMouseMove`.
+
+I feel like it could be broken down into two parts:
+
+1. Resizing.
+2. Preserving aspect ratio.
+
+Let's focus on resizing first.
+
+```tsx
+function handleMouseMove(mouseMoveEvent: MouseEvent) {
+  // This is the card's width
+  let newWidth = startWidth
+
+  // This is the card's height
+  let newHeight = startHeight
+
+  // We initialize the new position of the card to be the same as the starting position
+  let newX = startPosX
+  let newY = startPosY
+
+  // The difference between the starting position of the mouse and the current position
+  // The starting position is where the mouse was when resizing started
+  // This will be one of the corners of the card aka the resize handlers
+  const widthDiff = mouseMoveEvent.clientX - startX
+  const heightDiff = mouseMoveEvent.clientY - startY
+
+  switch (corner) {
+    case 'top-left': {
+      newWidth = Math.max(150, startWidth - widthDiff)
+      newHeight = Math.max(150, startHeight - heightDiff)
+
+      newX = startPosX + (startWidth - newWidth)
+      newY = startPosY + (startHeight - newHeight)
+      break
+    }
+
+    case 'top-right': {
+      newWidth = Math.max(150, startWidth + widthDiff)
+      newHeight = Math.max(150, startHeight - heightDiff)
+
+      newY = startPosY + (startHeight - newHeight)
+      break
+    }
+    case 'bottom-left': {
+      newWidth = Math.max(150, startWidth - widthDiff)
+      newHeight = Math.max(150, startHeight + heightDiff)
+
+      newX = startPosX + (startWidth - newWidth)
+      break
+    }
+    case 'bottom-right': {
+      newWidth = Math.max(150, startWidth + widthDiff)
+      newHeight = Math.max(150, startHeight + heightDiff)
+
+      break
+    }
+  }
+
+  updateCardSize(card.id, newWidth, newHeight)
+  updateCardPosition(card.id, newX, newY)
+}
+```
+
+This can be tricky to understand, so let's go over it slowly.
+
+## What are clientX and clientY?
+
+Let's start by looking at the card's `positionX` and `positionY`. These are the coordinates of the top left corner of the card.
+
+You may wonder what coordinates? Well, `positionX` is how many pixels from the left edge of the screen the card is, and `positionY` is how many pixels from the top edge of the screen the card is. That's how the browser calculates the position of elements.
+
+The same goes for `clientX` and `clientY`. These are the coordinates of the mouse pointer when the event happened. `clientX` is how many pixels from the left edge of the screen the mouse pointer is, and `clientY` is how many pixels from the top edge of the screen the mouse pointer is.
+
+## Difference calculation
+
+```tsx
+const widthDiff = mouseMoveEvent.clientX - startX
+const heightDiff = mouseMoveEvent.clientY - startY
+```
+
+Let's say the mouse was at `clientX` 100 when resizing started, and now it's at 150. The difference would be 50. This is how we calculate how much the mouse has moved. If `clientX` has increased, it means the mouse moved to the right. If it has decreased, it means the mouse moved to the left.
+
+If `clientY` has increased, it means the mouse moved down. If it has decreased, it means the mouse moved up.
+
+So if the difference for e.g. `clientX` is negative, it means `clientX` has decreased, and the mouse moved to the left, because we started at a position much further to the right.
+
+Now, with that out of the way, let's look at each case!
+
+## Top left corner
+
+For the top left corner, we know that if we resize the card, we want to not just calculate the new width and height, but also the new position of the card. Because the position of the card is the top left corner, we need to adjust the position of the card as we resize it.
+
+```tsx
+newWidth = Math.max(150, startWidth - widthDiff)
+newHeight = Math.max(150, startHeight - heightDiff)
+
+newX = startPosX + (startWidth - newWidth)
+newY = startPosY + (startHeight - newHeight)
+```
+
+We are using `max` to make sure the card does not get too small. We do not want the card to be smaller than 150 pixels. This applies to all cases.
+
+We can get the new width by subtracting the difference from the starting width. To understand this, we need some math. If the width difference is negative, it means the mouse moved to the left. Because we are dragging from the top left corner, we know that if we drag towards the left, the card should get wider. So if the width difference is negative, it would be e.g. `startWidth - (-50)`, which is the same as `startWidth + 50`. Minus and minus is a plus in math.
+
+What about the height?
+
+For the height, it is the same thing. If the height difference is negative, it means the mouse moved up. If the mouse moved up, the card should get taller. So if the height difference is negative, it would be e.g. `startHeight - (-50)`, which is the same as `startHeight + 50`.
+
+Do you start to see how it works?
+
+It just logic and basic math. We need to think about every corner and how it should behave when resizing.
+
+How do we calculcate the new top left corner position of the card: `newX` and `newY`?
+
+We know that the top left corner of the card is at `startPosX` and `startPosY`. We need to both adjust the offset from the left and the offset from the top.
+
+`newX = startPosX + (startWidth - newWidth)` -> This is how we calculate the new `x` position of the card. Say the startPosX is 400, and the startWidth is 200, and the newWidth is 150. We would get `400 + (200 - 150)`, which is `400 + 50`, which is `450`. This is what we want here because more towards the right means a higher `x` value, which would mean the card shrunk.
+
+Let's do another example. Let's say the startPosX is 400, and the startWidth is 200, and the newWidth is 250. We would get `400 + (200 - 250)`, which is `400 - 50`, which is `350`. This is what we want here because more towards the left means a lower `x` value, which would mean the card grew.
+
+Remember, this is how it works for the top left corner. Case by case, the calculations are different.
+
+`newY = startPosY + (startHeight - newHeight)` -> This is how we calculate the new `y` position of the card. Say the startPosY is 400, and the startHeight is 200, and the newHeight is 150. We would get `400 + (200 - 150)`, which is `400 + 50`, which is `450`. This is what we want here because more towards the bottom means a higher `y` value, which would mean the card shrunk.
+
+## Top right corner
+
+We covered a lot in the past sections, so we will focus on the new things here.
+
+This is the top right corner.
+
+```tsx
+newWidth = Math.max(150, startWidth + widthDiff)
+newHeight = Math.max(150, startHeight - heightDiff)
+
+newY = startPosY + (startHeight - newHeight)
+```
+
+`newWidth = Math.max(150, startWidth + widthDiff)` -> If widthDiff is negative, it means `clientX` has decreased, and the mouse moved to the left. If the most moved to the left, the card should get smaller because we are dragging from the top right corner. So if the width difference is negative, it would be e.g. `startWidth + (-50)`, which is the same as `startWidth - 50`.
+
+`newHeight = Math.max(150, startHeight - heightDiff)` -> If heightDiff is negative, it means `clientY` has decreased, and the mouse moved up. If the mouse moved up, the card should get taller. So if the height difference is negative, it would be e.g. `startHeight - (-50)`, which is the same as `startHeight + 50`.
+
+Because we can change the height of the top, which includes the top left corner, we also have to update `newY` which is the card's `y` position.
+
+`newY = startPosY + (startHeight - newHeight)` -> This is how we calculate the new `y` position of the card. Say the startPosY is 400, and the startHeight is 200, and the newHeight is 150. We would get `400 + (200 - 150)`, which is `400 + 50`, which is `450`. This is what we want here because more towards the bottom means a higher `y` value, which would mean the card shrunk.
+
+## Bottom left corner
+
+This is the bottom left corner.
+
+```tsx
+newWidth = Math.max(150, startWidth - widthDiff)
+newHeight = Math.max(150, startHeight + heightDiff)
+
+newX = startPosX + (startWidth - newWidth)
+```
+
+`newWidth = Math.max(150, startWidth - widthDiff)` -> If widthDiff is negative, it means `clientX` has decreased, and the mouse moved to the left. If the most moved to the left, the card should get wider because we are dragging from the bottom left corner. So if the width difference is negative, it would be e.g. `startWidth - (-50)`, which is the same as `startWidth + 50`.
+
+`newHeight = Math.max(150, startHeight + heightDiff)` -> If heightDiff is negative, it means `clientY` has decreased, and the mouse moved up. If the mouse moved up, the card should get shorter. So if the height difference is negative, it would be e.g. `startHeight + (-50)`, which is the same as `startHeight - 50`.
+
+Because we can change the left side, which includes the top left corner, we also have to update `newX` which is the card's `x` position.
+
+`newX = startPosX + (startWidth - newWidth)` -> Say the startPosX is 400, and the startWidth is 200, and the newWidth is 150. We would get `400 + (200 - 150)`, which is `400 + 50`, which is `450`. This is what we want here because more towards the right means a higher `x` value, which would mean the card shrunk.
+
+## Bottom right corner
+
+This is the bottom right corner.
+
+```tsx
+newWidth = Math.max(150, startWidth + widthDiff)
+newHeight = Math.max(150, startHeight + heightDiff)
+```
+
+`newWidth = Math.max(150, startWidth + widthDiff)` -> If widthDiff is negative, it means `clientX` has decreased, and the mouse moved to the left. If the mouse moved to the left, the card should get smaller because we are dragging from the bottom right corner. So if the width difference is negative, it would be e.g. `startWidth + (-50)`, which is the same as `startWidth - 50`.
+
+`newHeight = Math.max(150, startHeight + heightDiff)` -> If heightDiff is negative, it means `clientY` has decreased, and the mouse moved up. If the mouse moved up, the card should get shorter. So if the height difference is negative, it would be e.g. `startHeight + (-50)`, which is the same as `startHeight - 50`.
+
+## Preserving aspect ratio
+
+Now that we've gone through the resizing logic, let's talk about preserving the aspect ratio.
+
+When we resize the card, we don't want it to get distorted. We want it to remain a square. That's why when you look at the original code, you see that we calculate the new width and height, and then we calculate the maximum of the two. Now, maybe you could take the minimum of those two, but I decided to take the maximum and it works.
+
+```tsx
+const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
+newWidth = maxNewWidthAndHeight
+newHeight = maxNewWidthAndHeight
+```
+
+</details>
+
 # Liveblocks
 
 Liveblocks is the service I used for the real-time collab stuff.
