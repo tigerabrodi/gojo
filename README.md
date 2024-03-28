@@ -9,7 +9,7 @@ Some notes:
 - Focusing on a card brings it to the front.
 - When sharing, you can also copy link similar to Google Docs. Anyone with the link gets instant access.
 
-https://github.com/narutosstudent/gojo/assets/49603590/8869323b-d9b3-4a2a-8c21-e3651c46ef41
+https://github.com/tigerabrodi/gojo/assets/49603590/225eb6b8-97fd-495a-993c-1026e13c4308
 
 # Get it running locally
 
@@ -436,19 +436,6 @@ function onCardKeyDown(event: KeyboardEvent<HTMLDivElement>) {
 ```
 
 </details>
-
-# Bugs
-
-- Moving a card very fast stops the dragging. Probably because the cursor leaves the card's area.
-
-# Future Improvements Ideas
-
-- Nicer input in share dialog, similar to Google Docs: Auto complete + ability to add multiple users at once before sending out invite.
-- Add read role.
-- Send an "invite" rather than direct addition.
-- Ability to resize cards.
-- Ability to change font size, an option to have auto font size similar to Miro cards would be cool too.
-- Make it more accessible. It will never work without JavaScript because of the real-time experience, but making the drag experience accessible would be good.
 
 # Liveblocks
 
