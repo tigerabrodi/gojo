@@ -283,8 +283,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
 
       switch (corner) {
         case 'top-left': {
-          newWidth = Math.max(150, startWidth - widthDiff)
-          newHeight = Math.max(150, startHeight - heightDiff)
+          newWidth = Math.max(CARD_DIMENSIONS.width, startWidth - widthDiff)
+          newHeight = Math.max(CARD_DIMENSIONS.height, startHeight - heightDiff)
 
           const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
           newWidth = maxNewWidthAndHeight
@@ -296,8 +296,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
         }
 
         case 'top-right': {
-          newWidth = Math.max(150, startWidth + widthDiff)
-          newHeight = Math.max(150, startHeight - heightDiff)
+          newWidth = Math.max(CARD_DIMENSIONS.width, startWidth + widthDiff)
+          newHeight = Math.max(CARD_DIMENSIONS.height, startHeight - heightDiff)
 
           const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
           newWidth = maxNewWidthAndHeight
@@ -307,8 +307,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           break
         }
         case 'bottom-left': {
-          newWidth = Math.max(150, startWidth - widthDiff)
-          newHeight = Math.max(150, startHeight + heightDiff)
+          newWidth = Math.max(CARD_DIMENSIONS.width, startWidth - widthDiff)
+          newHeight = Math.max(CARD_DIMENSIONS.height, startHeight + heightDiff)
 
           const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
           newWidth = maxNewWidthAndHeight
@@ -318,8 +318,8 @@ export function Card({ card, index }: { card: CardType; index: number }) {
           break
         }
         case 'bottom-right': {
-          newWidth = Math.max(150, startWidth + widthDiff)
-          newHeight = Math.max(150, startHeight + heightDiff)
+          newWidth = Math.max(CARD_DIMENSIONS.width, startWidth + widthDiff)
+          newHeight = Math.max(CARD_DIMENSIONS.height, startHeight + heightDiff)
 
           const maxNewWidthAndHeight = Math.max(newWidth, newHeight)
           newWidth = maxNewWidthAndHeight
