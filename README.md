@@ -9,7 +9,7 @@ Some notes:
 - Focusing on a card brings it to the front.
 - When sharing, you can also copy link similar to Google Docs. Anyone with the link gets instant access.
 
-https://github.com/tigerabrodi/gojo/assets/49603590/225eb6b8-97fd-495a-993c-1026e13c4308
+https://github.com/tigerabrodi/gojo/assets/49603590/6bab85b4-e0cd-484b-ae87-c32e203b15cf
 
 # Get it running locally
 
