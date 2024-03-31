@@ -813,6 +813,6 @@ Another fun thing: It uses Cloudflare Durable objects [under the hood](https://l
 - Playwright -> Tests
 - Radix UI
 
-# Licsense
+# License
 
 MIT 💞
