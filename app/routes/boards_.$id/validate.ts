@@ -13,5 +13,9 @@ export async function checkUserAllowedToEnterBoardWithSecretId({
     },
   })
 
+  const allBoards = await prisma.board.findMany()
+
+  console.log('allBoards', allBoards)
+
   return board?.secretId === secretId
 }

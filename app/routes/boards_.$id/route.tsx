@@ -12,6 +12,7 @@ import { ClientSideSuspense } from '@liveblocks/react'
 import {
   Link,
   Outlet,
+  redirect,
   useFetcher,
   useLoaderData,
   useNavigate,
@@ -31,6 +32,7 @@ import {
 } from './queries'
 import styles from './styles.css'
 import { checkUserAllowedToEnterBoardWithSecretId } from './validate'
+import { getBoardsForUser } from '../boards/queries'
 
 import { requireAuthCookie } from '~/auth'
 import {
@@ -73,6 +75,14 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const boardId = params.id
 
   invariant(boardId, 'No board ID provided')
+
+  const allBoards = await getBoardsForUser(userId)
+
+  const isValid = allBoards.some((board) => {
+    return board.id === boardId
+  })
+
+  if (!isValid) return redirect('/')
 
   const currentUrl = new URL(request.url)
   const secretId = currentUrl.searchParams.get('secretId')
